@@ -1,0 +1,63 @@
+@keyframes scroll-ltr-slow {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+} 
+ 
+@keyframes scroll-ltr-desktop-smooth {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.shadow-md-custom {
+ box-shadow:-1px -1px 1px rgba(0, 0, 0, 0.03),   /* very light top-left */
+     4px 2px 8px rgba(0, 0, 0, 0.12),    /* strong right shadow */
+     0 2px 4px rgba(0, 0, 0, 0.08);          
+  border-radius: 10px;
+  background-color: white;
+  position: relative;
+  z-index: 1;
+}
+.bg-white{
+  background-color: #f0f0f0;
+}
+.logo-scroll-wrapper {
+   overflow-x: hidden;
+  overflow-y: visible; 
+  position: relative;
+  padding: 8px 0px;    
+}
+.logo-scroll-wrapper::before,
+.logo-scroll-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 60px; 
+  height: 100%;
+  z-index: 2;
+  pointer-events: none; 
+}
+
+.logo-scroll-wrapper::before {
+  left: 0;
+  background: linear-gradient(to right, #f0f0f0, transparent);
+}
+
+.logo-scroll-wrapper::after {
+  right: 0;
+  background: linear-gradient(to left, #f0f0f0, transparent);
+}
+.animate-scroll-ltr-slow {
+  animation: scroll-ltr-slow 30s linear infinite;
+}
+
+.animate-scroll-ltr-desktop-smooth {
+  animation: scroll-ltr-desktop-smooth 40s linear infinite;
+}
