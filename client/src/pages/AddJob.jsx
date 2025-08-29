@@ -485,7 +485,7 @@ const AddJob = () => {
 
         try {
             const response = await axios.post(
-                "${import.meta.env.VITE_API_BASE_URL}/api/jobs",
+                `${import.meta.env.VITE_API_BASE_URL}/api/jobs`,
                 newJob,
                 {
                     withCredentials: true,
