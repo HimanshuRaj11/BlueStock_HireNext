@@ -14,199 +14,199 @@ import { signInWithGoogle } from "../utils/googleAuth";
 import CookieConsentBanner from "./CookieConsentBanner";
 
 const RecruiterLogin = () => {
-    const { handleFetchMe, handleGoogleAuthRecruiter } = useUserContext();
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors },
-    } = useForm();
+  const { handleFetchMe, handleGoogleAuthRecruiter } = useUserContext();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-    let navigate = useNavigate();
-    let location = useLocation();
-    let from = location.state?.from?.pathname || "/";
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  let navigate = useNavigate();
+  let location = useLocation();
+  let from = location.state?.from?.pathname || "/";
 
-    const onSubmit = async (data) => {
-        setIsLoading(true);
-        try {
-            const response = await axios.post(
-                "http://localhost:3000/api/auth/login-recruiter",
-                data,
-                {
-                    withCredentials: true,
-                }
-            );
-            const user = response?.data?.user;
-            if (user?.role === 3 && user?.ac_status === 2) {
-                toast.warning(
-                    <div>
-                        Your account is temporarily on hold. <br/>
-                        <a href="#" style={{color: '#007bff'}}>Click here to activate</a>
-                    </div>,
-                    { autoClose: 3000 }
-                );
-                setIsLoading(false);
-                return;
-            }
-            if (user?.role === 3 && user?.ac_status === 3) {
-                toast.error(
-                    <div>
-                        Your account has been permanently disabled.<br/>
-                        <a href="#" style={{color: '#007bff'}}>Click here to appeal</a>
-                    </div>,
-                    { autoClose: 10000 }
-                );
-                setIsLoading(false);
-                return;
-            }
-            toast.success(response?.data?.message);
-            handleFetchMe();
-            reset();
-            navigate(from, { replace: true });
-        } catch (error) {
-            toast.error(error?.response?.data);
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/login-recruiter`,
+        data,
+        {
+          withCredentials: true,
         }
+      );
+      const user = response?.data?.user;
+      if (user?.role === 3 && user?.ac_status === 2) {
+        toast.warning(
+          <div>
+            Your account is temporarily on hold. <br />
+            <a href="#" style={{ color: '#007bff' }}>Click here to activate</a>
+          </div>,
+          { autoClose: 3000 }
+        );
         setIsLoading(false);
-    };
+        return;
+      }
+      if (user?.role === 3 && user?.ac_status === 3) {
+        toast.error(
+          <div>
+            Your account has been permanently disabled.<br />
+            <a href="#" style={{ color: '#007bff' }}>Click here to appeal</a>
+          </div>,
+          { autoClose: 10000 }
+        );
+        setIsLoading(false);
+        return;
+      }
+      toast.success(response?.data?.message);
+      handleFetchMe();
+      reset();
+      navigate(from, { replace: true });
+    } catch (error) {
+      toast.error(error?.response?.data);
+    }
+    setIsLoading(false);
+  };
 
-    const handleGoogleSignIn = async () => {
-        setIsGoogleLoading(true);
-        try {
-            const { user, error } = await signInWithGoogle();
-            if (error) throw new Error(error.message);
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
+    try {
+      const { user, error } = await signInWithGoogle();
+      if (error) throw new Error(error.message);
 
-            const result = await handleGoogleAuthRecruiter(user);
+      const result = await handleGoogleAuthRecruiter(user);
 
-            if (!result.success) {
-                if (result.isBlocked) {
-                    toast.info(
-                        <div>
-                            {result.message}<br/>
-                            <a href="#" style={{color: '#007bff'}}>Click here to activate your account</a>
-                        </div>,
-                        { autoClose: 10000 }
-                    );
-                } else {
-                    toast.error(result.message);
-                }
-                return;
-            }
-
-            toast.success(result?.message);
-            navigate(from, { replace: true });
-        } catch (error) {
-            toast.error(error.message);
+      if (!result.success) {
+        if (result.isBlocked) {
+          toast.info(
+            <div>
+              {result.message}<br />
+              <a href="#" style={{ color: '#007bff' }}>Click here to activate your account</a>
+            </div>,
+            { autoClose: 10000 }
+          );
+        } else {
+          toast.error(result.message);
         }
-        setIsGoogleLoading(false);
-    };
+        return;
+      }
 
-    return (
-        <Wrapper>
-            <ToastContainer 
-                position="top-center"
-                autoClose={10000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
+      toast.success(result?.message);
+      navigate(from, { replace: true });
+    } catch (error) {
+      toast.error(error.message);
+    }
+    setIsGoogleLoading(false);
+  };
+
+  return (
+    <Wrapper>
+      <ToastContainer
+        position="top-center"
+        autoClose={10000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <div className="container">
+        <div className="flex justify-center">
+          <Logo />
+        </div>
+        <h1>Login as Recruiter</h1>
+
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+          <div className="row">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email@example.com"
+              {...register("email", {
+                required: {
+                  value: true,
+                  message: "A valid email is required",
+                },
+              })}
             />
-            <div className="container">
-                <div className="flex justify-center">
-                    <Logo />
-                </div>
-                <h1>Login as Recruiter</h1>
+            {errors?.email && (
+              <span className="text-[10px] font-semibold text-red-600 mt-1 pl-1 tracking-wider">
+                {errors?.email?.message}
+              </span>
+            )}
+          </div>
+          <div className="row">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Type Here"
+              {...register("password", {
+                required: {
+                  value: true,
+                  message: "Password is required",
+                },
+              })}
+            />
+            {errors?.password && (
+              <span className="text-[10px] font-semibold text-red-600 mt-1 pl-1 tracking-wider">
+                {errors?.password?.message}
+              </span>
+            )}
+          </div>
+          <div className="flex justify-center">
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? "Loading..." : "Login"}
+            </button>
+          </div>
+        </form>
 
-                <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-                    <div className="row">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Email@example.com"
-                            {...register("email", {
-                                required: {
-                                    value: true,
-                                    message: "A valid email is required",
-                                },
-                            })}
-                        />
-                        {errors?.email && (
-                            <span className="text-[10px] font-semibold text-red-600 mt-1 pl-1 tracking-wider">
-                                {errors?.email?.message}
-                            </span>
-                        )}
-                    </div>
-                    <div className="row">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Type Here"
-                            {...register("password", {
-                                required: {
-                                    value: true,
-                                    message: "Password is required",
-                                },
-                            })}
-                        />
-                        {errors?.password && (
-                            <span className="text-[10px] font-semibold text-red-600 mt-1 pl-1 tracking-wider">
-                                {errors?.password?.message}
-                            </span>
-                        )}
-                    </div>
-                    <div className="flex justify-center">
-                        <button type="submit" disabled={isLoading}>
-                            {isLoading ? "Loading..." : "Login"}
-                        </button>
-                    </div>
-                </form>
+        <div className="divider">
+          <span>OR</span>
+        </div>
 
-                <div className="divider">
-                    <span>OR</span>
-                </div>
+        {/* Google Sign In Button */}
+        <div className="google-btn-container">
+          <button
+            type="button"
+            className="google-btn"
+            onClick={handleGoogleSignIn}
+            disabled={isGoogleLoading}
+          >
+            <FcGoogle className="google-icon" />
+            {isGoogleLoading ? "Processing..." : "Continue with Google"}
+          </button>
+        </div>
 
-                {/* Google Sign In Button */}
-                <div className="google-btn-container">
-                    <button 
-                        type="button" 
-                        className="google-btn"
-                        onClick={handleGoogleSignIn}
-                        disabled={isGoogleLoading}
-                    >
-                        <FcGoogle className="google-icon" />
-                        {isGoogleLoading ? "Processing..." : "Continue with Google"}
-                    </button>
-                </div>
-
-                <div className="">
-                    <p className="text-center text-[10px] font-semibold opacity-9 mt-3">
-                        New as a Recruiter.
-                        <Link className="ml-1 link" to="/register-recruiter">
-                            Create account
-                        </Link>
-                    </p>
-                </div>
-                <div className="alternate-login">
-                    <button 
-                        type="button" 
-                        className="user-btn" 
-                        onClick={() => navigate("/login")} 
-                        disabled={isLoading}
-                    >
-                        {isLoading ? "Loading..." : "Login as User"}
-                    </button>
-                </div>
-            </div>
-            <CookieConsentBanner />
-        </Wrapper>
-    );
+        <div className="">
+          <p className="text-center text-[10px] font-semibold opacity-9 mt-3">
+            New as a Recruiter.
+            <Link className="ml-1 link" to="/register-recruiter">
+              Create account
+            </Link>
+          </p>
+        </div>
+        <div className="alternate-login">
+          <button
+            type="button"
+            className="user-btn"
+            onClick={() => navigate("/login")}
+            disabled={isLoading}
+          >
+            {isLoading ? "Loading..." : "Login as User"}
+          </button>
+        </div>
+      </div>
+      <CookieConsentBanner />
+    </Wrapper>
+  );
 };
 
 const Wrapper = styled.div`

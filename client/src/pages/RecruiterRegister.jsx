@@ -38,7 +38,7 @@ const RecruiterRegister = () => {
             const user = { full_name, username, email, password, signup_type: "e" };
             try {
                 const response = await axios.post(
-                    "http://localhost:3000/api/auth/register-recruiter",
+                    `${import.meta.env.VITE_API_BASE_URL}/api/auth/register-recruiter`,
                     user
                 );
 
@@ -64,13 +64,13 @@ const RecruiterRegister = () => {
         setIsGoogleLoading(true);
         try {
             const { user, error } = await signInWithGoogle();
-            
+
             if (error) {
                 throw new Error(error.message);
             }
 
             // Send Google user data to your backend
-            const response = await axios.post("http://localhost:3000/api/auth/google-recruiter", {
+            const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/google-recruiter`, {
                 email: user.email,
                 full_name: user.displayName,
                 profile_photo: user.photoURL,
@@ -224,8 +224,8 @@ const RecruiterRegister = () => {
 
                 {/* Google Sign Up Button */}
                 <div className="google-btn-container">
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         className="google-btn"
                         onClick={handleGoogleSignUp}
                         disabled={isGoogleLoading}
@@ -243,10 +243,10 @@ const RecruiterRegister = () => {
                     </p>
                 </div>
                 <div className="alternate-register">
-                    <button 
-                        type="button" 
-                        className="user-btn" 
-                        onClick={() => navigate("/register")} 
+                    <button
+                        type="button"
+                        className="user-btn"
+                        onClick={() => navigate("/register")}
                         disabled={isLoading}
                     >
                         {isLoading ? "Loading..." : "Register as User"}
