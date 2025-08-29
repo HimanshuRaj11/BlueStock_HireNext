@@ -11,7 +11,9 @@ const corsOptions = {
     origin: [
         "https://job-portal-client-seven-pi.vercel.app",
         "https://researchengine.in",
+        "https://blue-stock-hire-next.vercel.app",
         "http://localhost:5173",
+        `${process.env.CLIENT_URL}`,
         "*"
     ],
     credentials: true,
