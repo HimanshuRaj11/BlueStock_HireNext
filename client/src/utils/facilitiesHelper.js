@@ -1,25 +1,25 @@
 
 export const fetchFacilitiesByName = async (name) => {
-    try {
-        const response = await fetch(`http://localhost:3000/api/facilities?name=${encodeURIComponent(name)}`, {
-            credentials: 'include',
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching facilities:', error);
-        return { error: error.message };
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/facilities?name=${encodeURIComponent(name)}`, {
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching facilities:', error);
+    return { error: error.message };
+  }
 };
 
 export const fetchFacilitiesByIds = async (ids) => {
   try {
     if (!ids || !Array.isArray(ids) || ids.length === 0) return [];
 
-    const response = await fetch('http://localhost:3000/api/facilities/by-ids', {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/facilities/by-ids`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -36,7 +36,7 @@ import { useUserContext } from "../context/UserContext";
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
-  
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedValue(value);
@@ -50,9 +50,9 @@ const useDebounce = (value, delay) => {
   return debouncedValue;
 };
 
-const SkillsAutocomplete = ({ 
-  value, 
-  onChange, 
+const SkillsAutocomplete = ({
+  value,
+  onChange,
   placeholder = "Type to search skills...",
   showSuggestionsSection = true
 }) => {
@@ -68,7 +68,7 @@ const SkillsAutocomplete = ({
   });
   const [error, setError] = useState(null);
   const abortControllerRef = useRef(null);
-  
+
   const debouncedSearchTerm = useDebounce(inputValue, 300);
 
   // Load current skill names when IDs change
@@ -81,15 +81,15 @@ const SkillsAutocomplete = ({
 
       setLoading(prev => ({ ...prev, current: true }));
       setError(null);
-      
+
       try {
         if (abortControllerRef.current) {
           abortControllerRef.current.abort();
         }
         abortControllerRef.current = new AbortController();
-        
-        const skills = await fetchSkillsByIds(value, { 
-          signal: abortControllerRef.current.signal 
+
+        const skills = await fetchSkillsByIds(value, {
+          signal: abortControllerRef.current.signal
         });
         setCurrentSkills(skills);
       } catch (err) {
@@ -101,7 +101,7 @@ const SkillsAutocomplete = ({
         setLoading(prev => ({ ...prev, current: false }));
       }
     };
-    
+
     loadCurrentSkills();
   }, [value]);
 
@@ -111,7 +111,7 @@ const SkillsAutocomplete = ({
 
     const loadSuggestedSkills = async () => {
       setLoading(prev => ({ ...prev, suggested: true }));
-      
+
       try {
         const skills = await fetchSuggestedSkills();
         setSuggestedSkills(skills);
@@ -136,17 +136,17 @@ const SkillsAutocomplete = ({
 
       setLoading(prev => ({ ...prev, search: true }));
       setError(null);
-      
+
       try {
         if (abortControllerRef.current) {
           abortControllerRef.current.abort();
         }
         abortControllerRef.current = new AbortController();
-        
-        const skills = await fetchSkillsByName(debouncedSearchTerm, { 
-          signal: abortControllerRef.current.signal 
+
+        const skills = await fetchSkillsByName(debouncedSearchTerm, {
+          signal: abortControllerRef.current.signal
         });
-        
+
         setFilteredSkills(skills);
         setShowSearchSuggestions(skills.length > 0);
       } catch (err) {
@@ -160,7 +160,7 @@ const SkillsAutocomplete = ({
         setLoading(prev => ({ ...prev, search: false }));
       }
     };
-    
+
     searchSkills();
   }, [debouncedSearchTerm]);
 
@@ -169,12 +169,12 @@ const SkillsAutocomplete = ({
       toast.error('You can only add up to 20 skills');
       return;
     }
-    
+
     if (!value.includes(skill.id)) {
       onChange([...value, skill.id]);
-      
+
       // Remove from suggested skills if it was there
-      setSuggestedSkills(prev => 
+      setSuggestedSkills(prev =>
         prev.filter(s => s.id !== skill.id)
       );
     }
@@ -226,7 +226,7 @@ const SkillsAutocomplete = ({
           className="skills-input"
           onFocus={() => inputValue && setShowSearchSuggestions(filteredSkills.length > 0)}
         />
-        
+
         {/* Search suggestions dropdown */}
         {showSearchSuggestions && (
           <div className="suggestions-dropdown">
@@ -316,7 +316,7 @@ const EditProfile = () => {
     formState: { errors },
   } = useForm();
 
-    useEffect(() => {
+  useEffect(() => {
     if (user) {
       setIsAuthReady(true);
     }
@@ -328,7 +328,7 @@ const EditProfile = () => {
       const fetchUserProfile = async () => {
         try {
           const response = await axios.get(
-            "http://localhost:3000/api/user-profile",
+            `${import.meta.env.VITE_API_BASE_URL}/api/user-profile`,
             { withCredentials: true }
           );
           setUserProfile(response.data);
@@ -357,23 +357,23 @@ const EditProfile = () => {
         let response;
         if (user?.role === 3) {
           response = await axios.get(
-            "http://localhost:3000/api/user-profile/skills",
+            `${import.meta.env.VITE_API_BASE_URL}/api/user-profile/skills`,
             { withCredentials: true }
           );
-          const skillsData = response.data?.skills || 
-                            response.data?.result?.skills || 
-                            response.data;
+          const skillsData = response.data?.skills ||
+            response.data?.result?.skills ||
+            response.data;
           if (Array.isArray(skillsData)) {
             setSkills(skillsData.map(skill => skill.id || skill));
           }
         } else if (user?.role === 2) {
           response = await axios.get(
-            "http://localhost:3000/api/recruiter-profile/skills",
+            `${import.meta.env.VITE_API_BASE_URL}/api/recruiter-profile/skills`,
             { withCredentials: true }
           );
-          const skillsData = response.data?.skills || 
-                            response.data?.result?.skills || 
-                            response.data;
+          const skillsData = response.data?.skills ||
+            response.data?.result?.skills ||
+            response.data;
           if (Array.isArray(skillsData)) {
             setSkills(skillsData.map(skill => skill.id || skill));
           }
@@ -382,7 +382,7 @@ const EditProfile = () => {
         console.error("Error fetching skills:", error);
       }
     };
-    
+
     fetchSkills();
   }, [user, isAuthReady]);
 
@@ -396,8 +396,8 @@ const EditProfile = () => {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
         <Box sx={{ width: '100%', mr: 1 }}>
-          <LinearProgress 
-            variant="determinate" 
+          <LinearProgress
+            variant="determinate"
             value={props.value}
             color={getProgressColor(props.value)}
             sx={{
@@ -430,24 +430,24 @@ const EditProfile = () => {
       userProfile,
       recruiterProfile
     };
-    
+
     setProfileCompletion(calculateProfileCompletion(user, profileData));
   }, [user, recruiterProfile, education, workExperiences, userProfile, skills, projects, certificates, aboutText, candidateSocialLinks, fullAddress]);
 
   const formatDisplayDate = (dateString) => {
     if (!dateString) return '';
-    
+
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short' 
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short'
     });
   };
 
   const fetchWorkExperiences = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/work-experience",
+        `${import.meta.env.VITE_API_BASE_URL}/api/work-experience`,
         { withCredentials: true }
       );
       setWorkExperiences(response.data);
@@ -459,7 +459,7 @@ const EditProfile = () => {
   // Add this function to handle resume update
   const handleUpdateResume = async () => {
     const resumeLink = watch("resume"); // Get the current value from the form
-    
+
     // Validate the resume link
     if (!resumeLink || typeof resumeLink !== 'string') {
       toast.error('Please enter a valid resume link');
@@ -479,16 +479,16 @@ const EditProfile = () => {
 
     try {
       await axios.patch(
-        "http://localhost:3000/api/users/update-resume",
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/update-resume`,
         { resume: resumeLink },
-        { 
+        {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json'
           }
         }
       );
-      
+
       toast.update(toastId, {
         render: "Resume updated successfully!",
         type: "success",
@@ -503,7 +503,7 @@ const EditProfile = () => {
     } catch (error) {
       console.error("Error updating resume:", error);
       let errorMessage = "Failed to update resume";
-      
+
       if (error.response) {
         // Handle specific error messages from server
         if (error.response.status === 400) {
@@ -526,14 +526,14 @@ const EditProfile = () => {
 
   const formatDateForInput = (isoDateString) => {
     if (!isoDateString) return '';
-    
+
     const date = new Date(isoDateString);
     const localDate = new Date(date.getTime() + (5.5 * 60 * 60 * 1000));
-    
+
     const year = localDate.getFullYear();
     const month = String(localDate.getMonth() + 1).padStart(2, '0');
     const day = String(localDate.getDate()).padStart(2, '0');
-    
+
     return `${year}-${month}-${day}`;
   };
 
@@ -543,12 +543,12 @@ const EditProfile = () => {
       const fetchRecruiterProfile = async () => {
         try {
           const response = await axios.get(
-            "http://localhost:3000/api/recruiter-profile",
+            `${import.meta.env.VITE_API_BASE_URL}/api/recruiter-profile`,
             { withCredentials: true }
           );
           const profile = response.data.result;
           setRecruiterProfile(profile);
-          
+
           // Set form values for recruiter fields
           if (profile) {
             setValue("purpose", profile.purpose || "");
@@ -577,7 +577,7 @@ const EditProfile = () => {
       const resetVerification = async () => {
         try {
           await axios.patch(
-            "http://localhost:3000/api/users/update-mobile-edit",
+            `${import.meta.env.VITE_API_BASE_URL}/api/users/update-mobile-edit`,
             {},
             { withCredentials: true }
           );
@@ -587,7 +587,7 @@ const EditProfile = () => {
           console.error("Error resetting verification:", error);
         }
       };
-      
+
       resetVerification();
     }
   }, [watch("mobile_no"), user?.mobile_no]);
@@ -599,7 +599,7 @@ const EditProfile = () => {
       closeOnClick: false,
       draggable: false
     });
-    
+
     try {
       // Common fields for all users - include all existing user data to prevent loss
       const updateUser = {
@@ -617,7 +617,7 @@ const EditProfile = () => {
           preference: user?.preference
         })
       };
-      
+
       // Update with new values from form (excluding resume)
       if (data.full_name) updateUser.full_name = data.full_name;
       if (data.username) updateUser.username = data.username;
@@ -636,9 +636,9 @@ const EditProfile = () => {
 
       // First update user data
       await axios.patch(
-        `http://localhost:3000/api/users/update`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/update`,
         updateUser,
-        { 
+        {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json'
@@ -649,7 +649,7 @@ const EditProfile = () => {
       // Then update recruiter-specific data if recruiter
       if (user?.role === 2) {
         await axios.patch(
-          "http://localhost:3000/api/recruiter-profile",
+          `${import.meta.env.VITE_API_BASE_URL}/api/recruiter-profile`,
           {
             purpose: data.purpose,
             designation: data.designation,
@@ -678,8 +678,8 @@ const EditProfile = () => {
     } catch (error) {
       let errorMessage = "Failed to update profile";
       if (error.response?.status === 409) {
-        errorMessage = typeof error.response.data === 'string' 
-          ? error.response.data 
+        errorMessage = typeof error.response.data === 'string'
+          ? error.response.data
           : error.response.data?.message || errorMessage;
       } else if (error.response?.status === 400) {
         errorMessage = Array.isArray(error.response.data.error)
@@ -738,7 +738,7 @@ const EditProfile = () => {
 
     try {
       await axios.patch(
-        "http://localhost:3000/api/user-profile/social-links",
+        `${import.meta.env.VITE_API_BASE_URL}/api/user-profile/social-links`,
         { social_links: socialLinks },
         { withCredentials: true }
       );
@@ -767,7 +767,7 @@ const EditProfile = () => {
   const fetchEducation = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/education",
+        `${import.meta.env.VITE_API_BASE_URL}/api/education`,
         { withCredentials: true }
       );
       setEducation(response.data.result);
@@ -779,7 +779,7 @@ const EditProfile = () => {
   const fetchCertificates = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/certificates",
+        `${import.meta.env.VITE_API_BASE_URL}/api/certificates`,
         { withCredentials: true }
       );
       setCertificates(response.data.result);
@@ -791,7 +791,7 @@ const EditProfile = () => {
   const fetchProjects = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/projects",
+        `${import.meta.env.VITE_API_BASE_URL}/api/projects`,
         { withCredentials: true }
       );
       setProjects(response.data.result);
@@ -803,7 +803,7 @@ const EditProfile = () => {
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/user-profile",
+        `${import.meta.env.VITE_API_BASE_URL}/api/user-profile`,
         { withCredentials: true }
       );
       const profile = response.data;
@@ -847,7 +847,7 @@ const EditProfile = () => {
 
     try {
       await axios.patch(
-        "http://localhost:3000/api/user-profile/about",
+        `${import.meta.env.VITE_API_BASE_URL}/api/user-profile/about`,
         { about: aboutText, full_address: fullAddress },
         { withCredentials: true }
       );
@@ -900,7 +900,7 @@ const EditProfile = () => {
 
     try {
       await axios.patch(
-        "http://localhost:3000/api/user-profile/social-links",
+        `${import.meta.env.VITE_API_BASE_URL}/api/user-profile/social-links`,
         { social_links: candidateSocialLinks },
         { withCredentials: true }
       );
@@ -927,7 +927,7 @@ const EditProfile = () => {
   };
 
   useEffect(() => {
-    if (user?.role === 3 || user?.role === 2) { 
+    if (user?.role === 3 || user?.role === 2) {
       fetchWorkExperiences();
     }
   }, [user]);
@@ -970,14 +970,14 @@ const EditProfile = () => {
 
       const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
       setConfirmationResult(confirmationResult);
-      
+
       toast.update(toastId, {
         render: "OTP sent successfully!",
         type: "success",
         isLoading: false,
         autoClose: 3000
       });
-      
+
       setOtpSent(true);
       setShowOtpInput(true);
     } catch (error) {
@@ -988,7 +988,7 @@ const EditProfile = () => {
         isLoading: false,
         autoClose: 3000
       });
-      
+
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
       }
@@ -999,17 +999,17 @@ const EditProfile = () => {
 
   const handleVerifyOtp = async () => {
     const toastId = toast.loading("Verifying mobile number...");
-    
+
     try {
       const credential = await confirmationResult.confirm(otp);
-      
+
       if (credential) {
         const updatedMobile = watch("mobile_no");
         await axios.patch(
-          "http://localhost:3000/api/users/update-mobile-verification",
-          { 
+          `${import.meta.env.VITE_API_BASE_URL}/api/users/update-mobile-verification`,
+          {
             mobile_no: updatedMobile,
-            is_mo_verified: true 
+            is_mo_verified: true
           },
           { withCredentials: true }
         );
@@ -1024,7 +1024,7 @@ const EditProfile = () => {
           isLoading: false,
           autoClose: 3000
         });
-        
+
         await handleFetchMe();
       } else {
         throw new Error("Firebase verification failed");
@@ -1064,10 +1064,10 @@ const EditProfile = () => {
     try {
       let endpoint, payload;
       if (user?.role === 3) {
-        endpoint = "http://localhost:3000/api/user-profile/skills";
+        endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/user-profile/skills`;
         payload = { skills: skills.map(Number) };
       } else if (user?.role === 2) {
-        endpoint = "http://localhost:3000/api/recruiter-profile/skills";
+        endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/recruiter-profile/skills`;
         payload = { skills: skills.map(Number) };
       }
 
@@ -1077,10 +1077,10 @@ const EditProfile = () => {
         { withCredentials: true }
       );
 
-      const updatedSkills = response.data?.skills || 
-                          response.data?.result?.skills || 
-                          response.data;
-      
+      const updatedSkills = response.data?.skills ||
+        response.data?.result?.skills ||
+        response.data;
+
       if (Array.isArray(updatedSkills)) {
         setSkills(updatedSkills);
       } else {
@@ -1101,9 +1101,9 @@ const EditProfile = () => {
       }, 1000);
     } catch (error) {
       console.error("Error updating skills:", error);
-      
+
       let errorMessage = error.response?.data?.message;
-      
+
       if (error.response?.status === 404 && error.response?.data?.message?.includes("Profile not found")) {
         errorMessage = "Complete current details first";
       }
@@ -1120,14 +1120,14 @@ const EditProfile = () => {
   };
 
   const isSectionComplete = (section) => {
-    switch(section) {
+    switch (section) {
       case 'basic':
         return user?.full_name && user?.username && user?.location && user?.gender;
       case 'resume':
         return user?.resume;
       case 'about':
-        return user?.role === 2 ? recruiterProfile?.about : 
-              user?.role === 3 ? aboutText : false;
+        return user?.role === 2 ? recruiterProfile?.about :
+          user?.role === 3 ? aboutText : false;
       case 'current':
         return userProfile;
       case 'education':
@@ -1169,7 +1169,7 @@ const EditProfile = () => {
       />
       <div className="profile-container">
         <div className="title-row">
-          <button 
+          <button
             onClick={() => navigate('/dashboard')}
             className="back-btn"
           >
@@ -1179,8 +1179,8 @@ const EditProfile = () => {
         </div>
 
         <div className="progress-container">
-          <LinearProgressWithLabel 
-            value={profileCompletion} 
+          <LinearProgressWithLabel
+            value={profileCompletion}
             sx={{
               height: 8,
               borderRadius: 4,
@@ -1190,7 +1190,7 @@ const EditProfile = () => {
             }}
           />
         </div>
-        
+
         <div className="profile-layout">
           {isMobile ? (
             <div className="mobile-tabbar">
@@ -1209,9 +1209,8 @@ const EditProfile = () => {
                 ].map((tab) => (
                   <button
                     key={tab.id}
-                    className={`tab ${activeSection === tab.id ? 'active' : ''} ${
-                      isSectionComplete(tab.id) ? 'complete' : ''
-                    }`}
+                    className={`tab ${activeSection === tab.id ? 'active' : ''} ${isSectionComplete(tab.id) ? 'complete' : ''
+                      }`}
                     onClick={() => setActiveSection(tab.id)}
                   >
                     {isSectionComplete(tab.id) ? (
@@ -1227,24 +1226,24 @@ const EditProfile = () => {
           ) : (
             <div className="sidebar">
               <ul>
-                <li 
+                <li
                   className={activeSection === 'basic' ? 'active' : ''}
                   onClick={() => setActiveSection('basic')}
                 >
                   {isSectionComplete('basic') ? <FaCheckCircle className="icon complete" /> : <FaRegCircle className="icon" />}
                   Basic Details
                 </li>
-                
-                <li 
+
+                <li
                   className={activeSection === 'resume' ? 'active' : ''}
                   onClick={() => setActiveSection('resume')}
                 >
                   {isSectionComplete('resume') ? <FaCheckCircle className="icon complete" /> : <FaRegCircle className="icon" />}
                   Resume
                 </li>
-                
+
                 {user?.role === 3 && (
-                  <li 
+                  <li
                     className={activeSection === 'current' ? 'active' : ''}
                     onClick={() => setActiveSection('current')}
                   >
@@ -1252,9 +1251,9 @@ const EditProfile = () => {
                     Current Details
                   </li>
                 )}
-                
+
                 {user?.role === 2 && (
-                  <li 
+                  <li
                     className={activeSection === 'about' ? 'active' : ''}
                     onClick={() => setActiveSection('about')}
                   >
@@ -1265,7 +1264,7 @@ const EditProfile = () => {
 
                 {(user?.role === 3 || user?.role === 2) && (
                   <>
-                    <li 
+                    <li
                       className={activeSection === 'education' ? 'active' : ''}
                       onClick={() => setActiveSection('education')}
                     >
@@ -1276,7 +1275,7 @@ const EditProfile = () => {
                       )}
                       Education
                     </li>
-                    <li 
+                    <li
                       className={activeSection === 'experience' ? 'active' : ''}
                       onClick={() => setActiveSection('experience')}
                     >
@@ -1287,7 +1286,7 @@ const EditProfile = () => {
                       )}
                       Work Experience
                     </li>
-                    <li 
+                    <li
                       className={activeSection === 'skills' ? 'active' : ''}
                       onClick={() => setActiveSection('skills')}
                     >
@@ -1303,14 +1302,14 @@ const EditProfile = () => {
 
                 {user?.role === 3 && (
                   <>
-                    <li 
+                    <li
                       className={activeSection === 'certificates' ? 'active' : ''}
                       onClick={() => setActiveSection('certificates')}
                     >
                       {isSectionComplete('certificates') ? <FaCheckCircle className="icon complete" /> : <FaRegCircle className="icon" />}
                       Certificates
                     </li>
-                    <li 
+                    <li
                       className={activeSection === 'projects' ? 'active' : ''}
                       onClick={() => setActiveSection('projects')}
                     >
@@ -1322,14 +1321,14 @@ const EditProfile = () => {
 
                 {user?.role === 3 && (
                   <>
-                    <li 
+                    <li
                       className={activeSection === 'about' ? 'active' : ''}
                       onClick={() => setActiveSection('about')}
                     >
                       {isSectionComplete('about') ? <FaCheckCircle className="icon complete" /> : <FaRegCircle className="icon" />}
                       About
                     </li>
-                    <li 
+                    <li
                       className={activeSection === 'social' ? 'active' : ''}
                       onClick={() => setActiveSection('social')}
                     >
@@ -1338,9 +1337,9 @@ const EditProfile = () => {
                     </li>
                   </>
                 )}
-                
+
                 {user?.role === 2 && (
-                  <li 
+                  <li
                     className={activeSection === 'social' ? 'active' : ''}
                     onClick={() => setActiveSection('social')}
                   >
@@ -1351,7 +1350,7 @@ const EditProfile = () => {
               </ul>
             </div>
           )}
-          
+
           <div className="content">
             <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
               {/* Basic Details Section */}
@@ -1439,8 +1438,8 @@ const EditProfile = () => {
                         name="role"
                         placeholder="Type Here"
                         defaultValue={
-                          user?.role === 1 ? 'Admin' : 
-                          user?.role === 2 ? 'Recruiter' : 'Candidate'
+                          user?.role === 1 ? 'Admin' :
+                            user?.role === 2 ? 'Recruiter' : 'Candidate'
                         }
                         readOnly
                       />
@@ -1582,9 +1581,9 @@ const EditProfile = () => {
                           />
                           {errors?.work_experience_years && (
                             <span className="error-message">
-                              {errors?.work_experience_years?.message || 
-                              (errors?.work_experience_years?.type === 'decimalPlaces' && 
-                                "Maximum 1 decimal place allowed")}
+                              {errors?.work_experience_years?.message ||
+                                (errors?.work_experience_years?.type === 'decimalPlaces' &&
+                                  "Maximum 1 decimal place allowed")}
                             </span>
                           )}
                         </div>
@@ -1678,8 +1677,8 @@ const EditProfile = () => {
                                 <img src="/greenverify.svg" alt="Verified" width={16} height={16} />
                               </div>
                             ) : (
-                              <button 
-                                type="button" 
+                              <button
+                                type="button"
                                 className="verify-btn"
                                 onClick={handleSendOtp}
                                 disabled={!watch("mobile_no") || otpSent || isSendingOtp}
@@ -1699,24 +1698,24 @@ const EditProfile = () => {
                           <div id="recaptcha-container" style={{ display: 'none' }}></div>
                         </div>
 
-                          {showOtpInput && (
-                            <div className="otp-container">
-                              <input
-                                type="text"
-                                placeholder="Enter OTP"
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
-                                maxLength={6}
-                              />
-                              <button 
-                                type="button"
-                                className="verify-otp-btn"
-                                onClick={handleVerifyOtp}
-                              >
-                                Verify OTP
-                              </button>
-                            </div>
-                          )}
+                        {showOtpInput && (
+                          <div className="otp-container">
+                            <input
+                              type="text"
+                              placeholder="Enter OTP"
+                              value={otp}
+                              onChange={(e) => setOtp(e.target.value)}
+                              maxLength={6}
+                            />
+                            <button
+                              type="button"
+                              className="verify-otp-btn"
+                              onClick={handleVerifyOtp}
+                            >
+                              Verify OTP
+                            </button>
+                          </div>
+                        )}
 
                         <div className="row">
                           <label htmlFor="dob">
@@ -1804,9 +1803,9 @@ const EditProfile = () => {
                   <h3>Current Details</h3>
                   <div className="form-grid">
                     <div className="row full-width">
-                      <UserProfileForm 
-                        profile={userProfile} 
-                        fetchProfile={fetchUserProfile} 
+                      <UserProfileForm
+                        profile={userProfile}
+                        fetchProfile={fetchUserProfile}
                       />
                     </div>
                   </div>
@@ -1951,13 +1950,13 @@ const EditProfile = () => {
                             {candidateSocialLinks.linkedin && (
                               <div className="link-item">
                                 <p>LinkedIn</p>
-                                <a 
-                                  href={candidateSocialLinks.linkedin} 
-                                  target="_blank" 
+                                <a
+                                  href={candidateSocialLinks.linkedin}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {candidateSocialLinks.linkedin.length > 30 
-                                    ? candidateSocialLinks.linkedin.substring(0, 30) + '...' 
+                                  {candidateSocialLinks.linkedin.length > 30
+                                    ? candidateSocialLinks.linkedin.substring(0, 30) + '...'
                                     : candidateSocialLinks.linkedin}
                                 </a>
                               </div>
@@ -1965,13 +1964,13 @@ const EditProfile = () => {
                             {candidateSocialLinks.github && (
                               <div className="link-item">
                                 <p>GitHub</p>
-                                <a 
-                                  href={candidateSocialLinks.github} 
-                                  target="_blank" 
+                                <a
+                                  href={candidateSocialLinks.github}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {candidateSocialLinks.github.length > 30 
-                                    ? candidateSocialLinks.github.substring(0, 30) + '...' 
+                                  {candidateSocialLinks.github.length > 30
+                                    ? candidateSocialLinks.github.substring(0, 30) + '...'
                                     : candidateSocialLinks.github}
                                 </a>
                               </div>
@@ -1979,13 +1978,13 @@ const EditProfile = () => {
                             {candidateSocialLinks.portfolio && (
                               <div className="link-item">
                                 <p>Portfolio</p>
-                                <a 
-                                  href={candidateSocialLinks.portfolio} 
-                                  target="_blank" 
+                                <a
+                                  href={candidateSocialLinks.portfolio}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {candidateSocialLinks.portfolio.length > 30 
-                                    ? candidateSocialLinks.portfolio.substring(0, 30) + '...' 
+                                  {candidateSocialLinks.portfolio.length > 30
+                                    ? candidateSocialLinks.portfolio.substring(0, 30) + '...'
                                     : candidateSocialLinks.portfolio}
                                 </a>
                               </div>
@@ -1993,13 +1992,13 @@ const EditProfile = () => {
                             {candidateSocialLinks.twitter && (
                               <div className="link-item">
                                 <p>Twitter</p>
-                                <a 
-                                  href={candidateSocialLinks.twitter} 
-                                  target="_blank" 
+                                <a
+                                  href={candidateSocialLinks.twitter}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {candidateSocialLinks.twitter.length > 30 
-                                    ? candidateSocialLinks.twitter.substring(0, 30) + '...' 
+                                  {candidateSocialLinks.twitter.length > 30
+                                    ? candidateSocialLinks.twitter.substring(0, 30) + '...'
                                     : candidateSocialLinks.twitter}
                                 </a>
                               </div>
@@ -2007,13 +2006,13 @@ const EditProfile = () => {
                             {candidateSocialLinks.leetcode && (
                               <div className="link-item">
                                 <p>LeetCode</p>
-                                <a 
-                                  href={candidateSocialLinks.leetcode} 
-                                  target="_blank" 
+                                <a
+                                  href={candidateSocialLinks.leetcode}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {candidateSocialLinks.leetcode.length > 30 
-                                    ? candidateSocialLinks.leetcode.substring(0, 30) + '...' 
+                                  {candidateSocialLinks.leetcode.length > 30
+                                    ? candidateSocialLinks.leetcode.substring(0, 30) + '...'
                                     : candidateSocialLinks.leetcode}
                                 </a>
                               </div>
@@ -2021,13 +2020,13 @@ const EditProfile = () => {
                             {candidateSocialLinks.other && (
                               <div className="link-item">
                                 <p>Other</p>
-                                <a 
-                                  href={candidateSocialLinks.other} 
-                                  target="_blank" 
+                                <a
+                                  href={candidateSocialLinks.other}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {candidateSocialLinks.other.length > 30 
-                                    ? candidateSocialLinks.other.substring(0, 30) + '...' 
+                                  {candidateSocialLinks.other.length > 30
+                                    ? candidateSocialLinks.other.substring(0, 30) + '...'
                                     : candidateSocialLinks.other}
                                 </a>
                               </div>
@@ -2062,7 +2061,7 @@ const EditProfile = () => {
                         {...register("about")}
                       />
                     </div>
-                    
+
                     <div className="row full-width">
                       <label htmlFor="full_address">Full Address</label>
                       <textarea
@@ -2083,19 +2082,19 @@ const EditProfile = () => {
                   <h3>Certificates</h3>
                   <div className="certificate-list">
                     {certificates.map((cert) => (
-                      <CertificateForm 
-                        key={cert.id} 
-                        certificate={cert} 
-                        fetchCertificates={fetchCertificates} 
+                      <CertificateForm
+                        key={cert.id}
+                        certificate={cert}
+                        fetchCertificates={fetchCertificates}
                       />
                     ))}
                     {showCertificateForm ? (
-                      <CertificateForm 
-                        fetchCertificates={fetchCertificates} 
+                      <CertificateForm
+                        fetchCertificates={fetchCertificates}
                         onCancel={() => setShowCertificateForm(false)}
                       />
                     ) : (
-                      <button 
+                      <button
                         className="add-btn"
                         onClick={() => setShowCertificateForm(true)}
                         type="button"
@@ -2143,19 +2142,19 @@ const EditProfile = () => {
                   <h3>Education Details</h3>
                   <div className="education-list">
                     {education.map((edu) => (
-                      <EducationForm 
-                        key={edu.id} 
-                        education={edu} 
-                        fetchEducation={fetchEducation} 
+                      <EducationForm
+                        key={edu.id}
+                        education={edu}
+                        fetchEducation={fetchEducation}
                       />
                     ))}
                     {showEducationForm ? (
-                      <EducationForm 
-                        fetchEducation={fetchEducation} 
+                      <EducationForm
+                        fetchEducation={fetchEducation}
                         onCancel={() => setShowEducationForm(false)}
                       />
                     ) : (
-                      <button 
+                      <button
                         className="add-btn"
                         onClick={() => setShowEducationForm(true)}
                         type="button"
@@ -2172,7 +2171,7 @@ const EditProfile = () => {
                   <h3>Skills</h3>
                   <div className="form-grid">
                     <div className="row full-width">
-                      <SkillsAutocomplete 
+                      <SkillsAutocomplete
                         value={skills}
                         onChange={setSkills}
                         placeholder="Search and add your skills..."
@@ -2204,19 +2203,19 @@ const EditProfile = () => {
                   <h3>Work Experience</h3>
                   <div className="experience-list">
                     {workExperiences.map(exp => (
-                      <WorkExperienceForm 
-                        key={exp.id} 
-                        experience={exp} 
-                        fetchExperiences={fetchWorkExperiences} 
+                      <WorkExperienceForm
+                        key={exp.id}
+                        experience={exp}
+                        fetchExperiences={fetchWorkExperiences}
                       />
                     ))}
                     {showWorkExperienceForm ? (
-                      <WorkExperienceForm 
-                        fetchExperiences={fetchWorkExperiences} 
+                      <WorkExperienceForm
+                        fetchExperiences={fetchWorkExperiences}
                         onCancel={() => setShowWorkExperienceForm(false)}
                       />
                     ) : (
-                      <button 
+                      <button
                         className="add-btn"
                         onClick={() => setShowWorkExperienceForm(true)}
                         type="button"
@@ -2327,13 +2326,13 @@ const EditProfile = () => {
                             {socialLinks.linkedin && (
                               <div className="link-item">
                                 <p>LinkedIn</p>
-                                <a 
-                                  href={socialLinks.linkedin} 
-                                  target="_blank" 
+                                <a
+                                  href={socialLinks.linkedin}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {socialLinks.linkedin.length > 30 
-                                    ? socialLinks.linkedin.substring(0, 30) + '...' 
+                                  {socialLinks.linkedin.length > 30
+                                    ? socialLinks.linkedin.substring(0, 30) + '...'
                                     : socialLinks.linkedin}
                                 </a>
                               </div>
@@ -2341,13 +2340,13 @@ const EditProfile = () => {
                             {socialLinks.github && (
                               <div className="link-item">
                                 <p>GitHub</p>
-                                <a 
-                                  href={socialLinks.github} 
-                                  target="_blank" 
+                                <a
+                                  href={socialLinks.github}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {socialLinks.github.length > 30 
-                                    ? socialLinks.github.substring(0, 30) + '...' 
+                                  {socialLinks.github.length > 30
+                                    ? socialLinks.github.substring(0, 30) + '...'
                                     : socialLinks.github}
                                 </a>
                               </div>
@@ -2355,13 +2354,13 @@ const EditProfile = () => {
                             {socialLinks.twitter && (
                               <div className="link-item">
                                 <p>Twitter</p>
-                                <a 
-                                  href={socialLinks.twitter} 
-                                  target="_blank" 
+                                <a
+                                  href={socialLinks.twitter}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {socialLinks.twitter.length > 30 
-                                    ? socialLinks.twitter.substring(0, 30) + '...' 
+                                  {socialLinks.twitter.length > 30
+                                    ? socialLinks.twitter.substring(0, 30) + '...'
                                     : socialLinks.twitter}
                                 </a>
                               </div>
@@ -2369,13 +2368,13 @@ const EditProfile = () => {
                             {socialLinks.website && (
                               <div className="link-item">
                                 <p>Website</p>
-                                <a 
-                                  href={socialLinks.website} 
-                                  target="_blank" 
+                                <a
+                                  href={socialLinks.website}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {socialLinks.website.length > 30 
-                                    ? socialLinks.website.substring(0, 30) + '...' 
+                                  {socialLinks.website.length > 30
+                                    ? socialLinks.website.substring(0, 30) + '...'
                                     : socialLinks.website}
                                 </a>
                               </div>
@@ -2383,13 +2382,13 @@ const EditProfile = () => {
                             {socialLinks.instagram && (
                               <div className="link-item">
                                 <p>Instagram</p>
-                                <a 
-                                  href={socialLinks.instagram} 
-                                  target="_blank" 
+                                <a
+                                  href={socialLinks.instagram}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {socialLinks.instagram.length > 30 
-                                    ? socialLinks.instagram.substring(0, 30) + '...' 
+                                  {socialLinks.instagram.length > 30
+                                    ? socialLinks.instagram.substring(0, 30) + '...'
                                     : socialLinks.instagram}
                                 </a>
                               </div>
@@ -2397,13 +2396,13 @@ const EditProfile = () => {
                             {socialLinks.other && (
                               <div className="link-item">
                                 <p>Other</p>
-                                <a 
-                                  href={socialLinks.other} 
-                                  target="_blank" 
+                                <a
+                                  href={socialLinks.other}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {socialLinks.other.length > 30 
-                                    ? socialLinks.other.substring(0, 30) + '...' 
+                                  {socialLinks.other.length > 30
+                                    ? socialLinks.other.substring(0, 30) + '...'
                                     : socialLinks.other}
                                 </a>
                               </div>

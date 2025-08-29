@@ -109,7 +109,7 @@ const EducationForm = ({ education, fetchEducation }) => {
         if (!formData.start_year || isNaN(formData.start_year) || formData.start_year < 1900 || formData.start_year > new Date().getFullYear()) {
             toast.update(toastId, {
                 render: "Valid Start Year is required",
-                type: "error",  
+                type: "error",
                 isLoading: false,
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -139,7 +139,7 @@ const EducationForm = ({ education, fetchEducation }) => {
         try {
             if (education && education.id) {
                 const response = await axios.patch(
-                    `http://localhost:3000/api/education/${education.id}`,
+                    `${import.meta.env.VITE_API_BASE_URL}/api/education/${education.id}`,
                     formData,
                     {
                         withCredentials: true,
@@ -158,7 +158,7 @@ const EducationForm = ({ education, fetchEducation }) => {
                 });
             } else {
                 const response = await axios.post(
-                    `http://localhost:3000/api/education`,
+                    `${import.meta.env.VITE_API_BASE_URL}/api/education`,
                     formData,
                     {
                         withCredentials: true,
@@ -185,7 +185,7 @@ const EducationForm = ({ education, fetchEducation }) => {
                 config: error.config
             });
             showErrorAlert(
-                'Error', 
+                'Error',
                 `Failed to save: ${error.response?.data?.message || error.message}`
             );
         } finally {
@@ -194,8 +194,8 @@ const EducationForm = ({ education, fetchEducation }) => {
     };
 
     const handleDelete = async (e) => {
-        e.preventDefault(); 
-        e.stopPropagation(); 
+        e.preventDefault();
+        e.stopPropagation();
 
         const result = await Swal.fire({
             title: 'Are you sure?',
@@ -214,7 +214,7 @@ const EducationForm = ({ education, fetchEducation }) => {
             setLoading(true);
             try {
                 await axios.delete(
-                    `http://localhost:3000/api/education/${education.id}`,
+                    `${import.meta.env.VITE_API_BASE_URL}/api/education/${education.id}`,
                     { withCredentials: true }
                 );
                 await fetchEducation();
@@ -264,10 +264,10 @@ const EducationForm = ({ education, fetchEducation }) => {
     }
 
     return (
-        <FormWrapper 
+        <FormWrapper
             onSubmit={handleSubmit}
             method="post"
-        >  
+        >
             <div className="form-row">
                 <label>Course Name*</label>
                 <input
@@ -338,7 +338,7 @@ const EducationForm = ({ education, fetchEducation }) => {
                         Cancel
                     </button>
                 )}
-            </div> 
+            </div>
         </FormWrapper>
     );
 };

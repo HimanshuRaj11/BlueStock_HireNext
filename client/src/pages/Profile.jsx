@@ -58,7 +58,7 @@ const ProfileHeader = ({ userData, isMobile, activeTab, setActiveTab }) => {
 
                 let promises = [];
                 promises.push(
-                    axios.get("http://localhost:3000/api/user-profile/skills",
+                    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/user-profile/skills`,
                         { withCredentials: true })
                         .then(res => {
                             return { skills: res.data.skills || res.data || [] };
@@ -70,7 +70,7 @@ const ProfileHeader = ({ userData, isMobile, activeTab, setActiveTab }) => {
 
                 if (user.role === 3) {
                     promises = promises.concat([
-                        axios.get("http://localhost:3000/api/user-profile",
+                        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/user-profile`,
                             { withCredentials: true })
                             .then(res => {
                                 return {
@@ -83,7 +83,7 @@ const ProfileHeader = ({ userData, isMobile, activeTab, setActiveTab }) => {
                             .catch(() => {
                                 return {};
                             }),
-                        axios.get("http://localhost:3000/api/education",
+                        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/education`,
                             { withCredentials: true })
                             .then(res => {
                                 return { education: res.data.result || res.data || [] };
@@ -91,7 +91,7 @@ const ProfileHeader = ({ userData, isMobile, activeTab, setActiveTab }) => {
                             .catch(() => {
                                 return { education: [] };
                             }),
-                        axios.get("http://localhost:3000/api/work-experience",
+                        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/work-experience`,
                             { withCredentials: true })
                             .then(res => {
                                 return { workExperiences: res.data.result || res.data || [] };
@@ -99,7 +99,7 @@ const ProfileHeader = ({ userData, isMobile, activeTab, setActiveTab }) => {
                             .catch(() => {
                                 return { workExperiences: [] };
                             }),
-                        axios.get("http://localhost:3000/api/certificates",
+                        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/certificates`,
                             { withCredentials: true })
                             .then(res => {
                                 return { certificates: res.data.result || res.data || [] };
@@ -107,7 +107,7 @@ const ProfileHeader = ({ userData, isMobile, activeTab, setActiveTab }) => {
                             .catch(() => {
                                 return { certificates: [] };
                             }),
-                        axios.get("http://localhost:3000/api/projects",
+                        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/projects`,
                             { withCredentials: true })
                             .then(res => {
                                 return { projects: res.data.result || res.data || [] };
@@ -118,7 +118,7 @@ const ProfileHeader = ({ userData, isMobile, activeTab, setActiveTab }) => {
                     ]);
                 } else if (user.role === 2) {
                     promises.push(
-                        axios.get("http://localhost:3000/api/recruiter-profile",
+                        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/recruiter-profile`,
                             { withCredentials: true })
                             .then(res => {
                                 return { recruiterProfile: res.data };
@@ -270,7 +270,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get("http://localhost:3000/api/auth/me", { withCredentials: true });
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/auth/me`, { withCredentials: true });
                 setUserData(response.data.result);
                 if (response.data.result.profile?.skills?.length > 0) {
                     const skillNames = await fetchSkillsByIds(response.data.result.profile.skills);
@@ -333,7 +333,7 @@ const Profile = () => {
 
         try {
             const res = await axios.patch(
-                "http://localhost:3000/api/auth/status",
+                `${import.meta.env.VITE_API_BASE_URL}/api/auth/status`,
                 { ac_status: newStatus },
                 { withCredentials: true }
             );

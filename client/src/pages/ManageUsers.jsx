@@ -20,7 +20,7 @@ const ManageUsers = () => {
     } = useQuery({
         queryKey: ["users"],
         queryFn: () =>
-            getAllHandler(`http://localhost:3000/api/users`),
+            getAllHandler(`${import.meta.env.VITE_API_BASE_URL}/api/users`),
     });
 
     const updateUserModal = (id, role) => {
@@ -43,7 +43,7 @@ const ManageUsers = () => {
         const updateUser = { id, role };
         try {
             const response = await axios.patch(
-                `http://localhost:3000/api/admin/update-role`,
+                `${import.meta.env.VITE_API_BASE_URL}/api/admin/update-role`,
                 updateUser,
                 { withCredentials: true }
             );
@@ -108,9 +108,9 @@ const ManageUsers = () => {
                                     <td>{user?.username}</td>
                                     <td>{user?.email}</td>
                                     <td>
-                                        {user?.role === 1 ? 'Admin' : 
-                                         user?.role === 2 ? 'Recruiter' : 
-                                         'User'}
+                                        {user?.role === 1 ? 'Admin' :
+                                            user?.role === 2 ? 'Recruiter' :
+                                                'User'}
                                     </td>
                                     <td className="action-row">
                                         {user?.id === me.id ? null : (

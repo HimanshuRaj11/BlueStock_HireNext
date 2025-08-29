@@ -16,9 +16,9 @@ const CookieConsentBanner = () => {
 
   const handleAccept = () => {
     localStorage.setItem("cookieConsent", "true");
-    
+
     setIsVisible(false);
-    
+
     setTimeout(() => {
       setShowBanner(false);
       // Enable third-party cookies by making a test request
@@ -28,7 +28,7 @@ const CookieConsentBanner = () => {
 
   const enableThirdPartyCookies = async () => {
     try {
-      await fetch("http://localhost:3000/api/auth/cookie-test", {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/cookie-test`, {
         method: "GET",
         credentials: "include",
       });
@@ -47,7 +47,7 @@ const CookieConsentBanner = () => {
       ${isVisible ? 'translate-y-0' : 'translate-y-full'}
     `}>
       <p className="text-sm mb-2 md:mb-0 md:mr-4">
-        This site uses cookies to deliver services, personalize information, and improve user experience. 
+        This site uses cookies to deliver services, personalize information, and improve user experience.
         By continuing to use the site, you agree to our{" "}
         <a href="/privacy" className="underline">Privacy Policy</a> and{" "}
         <a href="/terms" className="underline">Terms of Use</a>.

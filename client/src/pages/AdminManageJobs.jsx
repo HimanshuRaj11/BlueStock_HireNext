@@ -28,7 +28,7 @@ const AdminManageJobs = () => {
     } = useQuery({
         queryKey: ['all-jobs'],
         queryFn: () => getAllHandler(
-            'http://localhost:3000/api/jobs/review'
+            `${import.meta.env.VITE_API_BASE_URL}/api/jobs/review`
         ),
     });
 
@@ -37,19 +37,20 @@ const AdminManageJobs = () => {
             const result = await updateJobStatus(jobId, newStatus, adminComment);
             if (result.success) {
                 // Update local state immediately
-                const updatedJobs = jobs.result.map(job => 
-                    job.id === jobId 
-                        ? { ...job, 
-                            visibility_status: newStatus, 
-                            admin_comment: adminComment 
-                          } 
+                const updatedJobs = jobs.result.map(job =>
+                    job.id === jobId
+                        ? {
+                            ...job,
+                            visibility_status: newStatus,
+                            admin_comment: adminComment
+                        }
                         : job
                 );
-                
+
                 // Update the query cache
-                queryClient.setQueryData(['all-jobs'], { 
-                    ...jobs, 
-                    result: updatedJobs 
+                queryClient.setQueryData(['all-jobs'], {
+                    ...jobs,
+                    result: updatedJobs
                 });
 
                 Swal.fire({
@@ -59,7 +60,7 @@ const AdminManageJobs = () => {
                 });
                 setEditingJobId(null);
                 setAdminComment("");
-                
+
                 // Optional: Refetch to ensure data consistency
                 refetch();
             }
@@ -75,7 +76,7 @@ const AdminManageJobs = () => {
     const deleteJob = async (id) => {
         try {
             await axios.delete(
-                `http://localhost:3000/api/jobs/${id}`,
+                `${import.meta.env.VITE_API_BASE_URL}/api/jobs/${id}`,
                 { withCredentials: true }
             );
             refetch();

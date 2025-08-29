@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
-import { 
-    FaHome, 
-    FaMoneyBillWave, 
-    FaClock, 
-    FaFileAlt, 
-    FaLaptop, 
-    FaUtensils, 
-    FaAward, 
-    FaHandshake, 
-    FaCar, 
-    FaMedkit, 
-    FaChalkboardTeacher, 
+import {
+    FaHome,
+    FaMoneyBillWave,
+    FaClock,
+    FaFileAlt,
+    FaLaptop,
+    FaUtensils,
+    FaAward,
+    FaHandshake,
+    FaCar,
+    FaMedkit,
+    FaChalkboardTeacher,
     FaChartLine,
-    FaQuestion 
+    FaQuestion
 } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import { getSingleHandler } from "../utils/FetchHandlers";
-import { fetchSkillsByIds} from "../utils/skillsHelper";
+import { fetchSkillsByIds } from "../utils/skillsHelper";
 import { fetchFacilitiesByIds } from "../utils/facilitiesHelper";
 import { fetchCategoriesByIds } from "../utils/categoriesHelper";
 import { postHandler } from "../utils/FetchHandlers";
@@ -89,7 +89,7 @@ const Job = () => {
         error,
     } = useQuery({
         queryKey: ["job", id],
-        queryFn: () => getSingleHandler(`http://localhost:3000/api/jobs/${id}`),
+        queryFn: () => getSingleHandler(`${import.meta.env.VITE_API_BASE_URL}/api/jobs/${id}`),
     });
 
     // Fetch skill names and categories from their IDs
@@ -128,7 +128,7 @@ const Job = () => {
         };
         try {
             const response = await postHandler({
-                url: "http://localhost:3000/api/application/apply",
+                url: `${import.meta.env.VITE_API_BASE_URL}/api/application/apply`,
                 body: appliedJob,
             });
             toast.success("Application submitted successfully!", {
@@ -161,204 +161,204 @@ const Job = () => {
     };
 
     return (
-            <Wrapper>
-                <ToastContainer 
-                    position="top-right"
-                    autoClose={5000}
-                    hideProgressBar={false}
-                    closeOnClick
-                    pauseOnHover
-                    draggable
-                    theme="light"
-                />
-                {/* Fixed Top Bar */}
-                <div className="fixed-top-bar">
-                    <div className="top-bar-content">
-                        <button 
-                            className="back-button"
-                            onClick={() => navigate(-1)}
-                        >
-                            <FiArrowLeft />
-                        </button>
-                        <h2 className="job-title">{job?.position}</h2>
-                    </div>
-                    <div className="tab-bar">
-                        <button 
-                            className={`tab ${activeTab === "details" ? "active" : ""}`}
-                            onClick={() => setActiveTab("details")}
-                        >
-                            Job Details
-                        </button>
-                        <button 
-                            className={`tab ${activeTab === "dates" ? "active" : ""}`}
-                            onClick={() => setActiveTab("dates")}
-                        >
-                            Dates
-                        </button>
-                        <button 
-                            className={`tab ${activeTab === "facilities" ? "active" : ""}`}
-                            onClick={() => setActiveTab("facilities")}
-                        >
-                            Facilities
-                        </button>
-                        <button 
-                            className={`tab ${activeTab === "skills" ? "active" : ""}`}
-                            onClick={() => setActiveTab("skills")}
-                        >
-                            Required Skills
-                        </button>
-                    </div>
+        <Wrapper>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                closeOnClick
+                pauseOnHover
+                draggable
+                theme="light"
+            />
+            {/* Fixed Top Bar */}
+            <div className="fixed-top-bar">
+                <div className="top-bar-content">
+                    <button
+                        className="back-button"
+                        onClick={() => navigate(-1)}
+                    >
+                        <FiArrowLeft />
+                    </button>
+                    <h2 className="job-title">{job?.position}</h2>
                 </div>
+                <div className="tab-bar">
+                    <button
+                        className={`tab ${activeTab === "details" ? "active" : ""}`}
+                        onClick={() => setActiveTab("details")}
+                    >
+                        Job Details
+                    </button>
+                    <button
+                        className={`tab ${activeTab === "dates" ? "active" : ""}`}
+                        onClick={() => setActiveTab("dates")}
+                    >
+                        Dates
+                    </button>
+                    <button
+                        className={`tab ${activeTab === "facilities" ? "active" : ""}`}
+                        onClick={() => setActiveTab("facilities")}
+                    >
+                        Facilities
+                    </button>
+                    <button
+                        className={`tab ${activeTab === "skills" ? "active" : ""}`}
+                        onClick={() => setActiveTab("skills")}
+                    >
+                        Required Skills
+                    </button>
+                </div>
+            </div>
 
-                {/* Scrollable Content */}
-                <div className="scrollable-content">
-                    {activeTab === "details" && (
-                        <>
-                            <div className="apply-section">
+            {/* Scrollable Content */}
+            <div className="scrollable-content">
+                {activeTab === "details" && (
+                    <>
+                        <div className="apply-section">
+                            <button
+                                className="apply-now-btn"
+                                onClick={() => handleApply(job.id)}
+                            >
+                                Apply Now
+                            </button>
+                            <div className="action-buttons">
                                 <button
-                                    className="apply-now-btn"
-                                    onClick={() => handleApply(job.id)}
+                                    className={`heart-btn ${isLiked ? 'liked' : ''}`}
+                                    onClick={handleLikeClick}
                                 >
-                                    Apply Now
-                                </button>
-                                <div className="action-buttons">
-                                    <button 
-                                        className={`heart-btn ${isLiked ? 'liked' : ''}`}
-                                        onClick={handleLikeClick}
-                                    >
-                                        {isLiked ? (
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red" width="24px" height="24px">
-                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                            </svg>
-                                        ) : (
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24px" height="24px">
-                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                            </svg>
-                                        )}
-                                    </button>
-                                    <button className="share-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24px" height="24px">
-                                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+                                    {isLiked ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red" width="24px" height="24px">
+                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                                         </svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24px" height="24px">
+                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                        </svg>
+                                    )}
+                                </button>
+                                <button className="share-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24px" height="24px">
+                                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div className="content-section">
+                            <div className="info-row">
+                                <h4 className="info-label">Posted by:</h4>
+                                <p className="info-value">{job?.company}</p>
+                            </div>
+
+                            <div className="info-row">
+                                <h4 className="info-label">Job Description:</h4>
+                                <p className="info-value">{job?.job_description}</p>
+                            </div>
+
+                            <div className="info-row">
+                                <h4 className="info-label">Job Vacancy:</h4>
+                                <p className="info-value">{job?.job_vacancy}</p>
+                            </div>
+
+                            <div className="info-row">
+                                <h4 className="info-label">Salary:</h4>
+                                <p className="info-value">
+                                    {formatSalary(job)}
+                                </p>
+                            </div>
+
+                            {categoryNames.length > 0 && (
+                                <div className="info-row">
+                                    <h4 className="info-label">Job Categories:</h4>
+                                    <div className="tags-container">
+                                        {categoryNames.map((category) => (
+                                            <span key={category} className="category-tag">
+                                                {category}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="info-row">
+                                <h4 className="info-label">To Apply:</h4>
+                                <div className="apply-info">
+                                    <p>Send your CV/resume to:</p>
+                                    <button className="email-btn" onClick={handleEmailClick}>
+                                        <HiOutlineMail className="mail-icon" />
+                                        {job?.job_contact}
                                     </button>
                                 </div>
                             </div>
-                            <div className="content-section">
-                                <div className="info-row">
-                                    <h4 className="info-label">Posted by:</h4>
-                                    <p className="info-value">{job?.company}</p>
-                                </div>
-                                
-                                <div className="info-row">
-                                    <h4 className="info-label">Job Description:</h4>
-                                    <p className="info-value">{job?.job_description}</p>
-                                </div>
-                                
-                                <div className="info-row">
-                                    <h4 className="info-label">Job Vacancy:</h4>
-                                    <p className="info-value">{job?.job_vacancy}</p>
-                                </div>
-                                
-                                <div className="info-row">
-                                    <h4 className="info-label">Salary:</h4>
-                                    <p className="info-value">
-                                        {formatSalary(job)}
-                                    </p>
-                                </div>
-                                
-                                {categoryNames.length > 0 && (
-                                    <div className="info-row">
-                                        <h4 className="info-label">Job Categories:</h4>
-                                        <div className="tags-container">
-                                            {categoryNames.map((category) => (
-                                                <span key={category} className="category-tag">
-                                                    {category}
-                                                </span>
-                                            ))}
+                        </div>
+                    </>
+                )}
+
+                {activeTab === "dates" && (
+                    <div className="content-section">
+                        <div className="info-row">
+                            <h4 className="info-label">Posted Date:</h4>
+                            <p className="info-value">
+                                <MdAccessTime className="text-lg mr-1" />
+                                {dayjs(job?.result?.created_at).format("MMM Do, YYYY")}
+                            </p>
+                        </div>
+
+                        <div className="info-row">
+                            <h4 className="info-label">Deadline:</h4>
+                            <p className="info-value">
+                                <MdAccessTime className="text-lg mr-1" />
+                                {dayjs(job?.job_deadline).format("MMM Do, YYYY")}
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === "facilities" && facilityNames.length > 0 && (
+                    <div className="content-section">
+                        <div className="facilities-grid">
+                            {facilityNames.map((facility) => {
+                                // Define icons for each facility type
+                                const facilityIcons = {
+                                    "Work From Home": <FaHome size={24} />,
+                                    "Stipend / Salary": <FaMoneyBillWave size={24} />,
+                                    "Flexible Working Hours": <FaClock size={24} />,
+                                    "Certificate / Experience Letter": <FaFileAlt size={24} />,
+                                    "Laptop / Equipment Provided": <FaLaptop size={24} />,
+                                    "Free Meals / Snacks": <FaUtensils size={24} />,
+                                    "Performance Bonus / Incentives": <FaAward size={24} />,
+                                    "Job Offer on Completion (PPO)": <FaHandshake size={24} />,
+                                    "Travel / Cab Facility": <FaCar size={24} />,
+                                    "Health Insurance / Mediclaim": <FaMedkit size={24} />,
+                                    "Training and Mentorship": <FaChalkboardTeacher size={24} />,
+                                    "ESOPs / Equity": <FaChartLine size={24} />
+                                };
+
+                                return (
+                                    <div key={facility} className="facility-card">
+                                        <div className="facility-icon">
+                                            {facilityIcons[facility] || <FaQuestion size={24} />}
                                         </div>
+                                        <div className="facility-name">{facility}</div>
                                     </div>
-                                )}
-                                
-                                <div className="info-row">
-                                    <h4 className="info-label">To Apply:</h4>
-                                    <div className="apply-info">
-                                        <p>Send your CV/resume to:</p>
-                                        <button className="email-btn" onClick={handleEmailClick}>
-                                            <HiOutlineMail className="mail-icon" />
-                                            {job?.job_contact}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </>
-                    )}
-
-                    {activeTab === "dates" && (
-                        <div className="content-section">
-                            <div className="info-row">
-                                <h4 className="info-label">Posted Date:</h4>
-                                <p className="info-value">
-                                    <MdAccessTime className="text-lg mr-1" />
-                                    {dayjs(job?.result?.created_at).format("MMM Do, YYYY")}
-                                </p>
-                            </div>
-                            
-                            <div className="info-row">
-                                <h4 className="info-label">Deadline:</h4>
-                                <p className="info-value">
-                                    <MdAccessTime className="text-lg mr-1" />
-                                    {dayjs(job?.job_deadline).format("MMM Do, YYYY")}
-                                </p>
-                            </div>
+                                );
+                            })}
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    {activeTab === "facilities" && facilityNames.length > 0 && (
-                        <div className="content-section">
-                            <div className="facilities-grid">
-                                {facilityNames.map((facility) => {
-                                    // Define icons for each facility type
-                                    const facilityIcons = {
-                                        "Work From Home": <FaHome size={24} />,
-                                        "Stipend / Salary": <FaMoneyBillWave size={24} />,
-                                        "Flexible Working Hours": <FaClock size={24} />,
-                                        "Certificate / Experience Letter": <FaFileAlt size={24} />,
-                                        "Laptop / Equipment Provided": <FaLaptop size={24} />,
-                                        "Free Meals / Snacks": <FaUtensils size={24} />,
-                                        "Performance Bonus / Incentives": <FaAward size={24} />,
-                                        "Job Offer on Completion (PPO)": <FaHandshake size={24} />,
-                                        "Travel / Cab Facility": <FaCar size={24} />,
-                                        "Health Insurance / Mediclaim": <FaMedkit size={24} />,
-                                        "Training and Mentorship": <FaChalkboardTeacher size={24} />,
-                                        "ESOPs / Equity": <FaChartLine size={24} />
-                                    };
-
-                                    return (
-                                        <div key={facility} className="facility-card">
-                                            <div className="facility-icon">
-                                                {facilityIcons[facility] || <FaQuestion size={24} />}
-                                            </div>
-                                            <div className="facility-name">{facility}</div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                {activeTab === "skills" && skillNames.length > 0 && (
+                    <div className="content-section">
+                        <div className="tags-container">
+                            {skillNames.map((skill) => (
+                                <span key={skill} className="skill-tag">
+                                    {skill}
+                                </span>
+                            ))}
                         </div>
-                    )}
-
-                    {activeTab === "skills" && skillNames.length > 0 && (
-                        <div className="content-section">
-                            <div className="tags-container">
-                                {skillNames.map((skill) => (
-                                    <span key={skill} className="skill-tag">
-                                        {skill}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </Wrapper>
+                    </div>
+                )}
+            </div>
+        </Wrapper>
     );
 };
 

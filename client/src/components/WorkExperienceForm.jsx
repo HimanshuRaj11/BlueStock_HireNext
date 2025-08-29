@@ -6,7 +6,7 @@ import LoadingComTwo from "./shared/LoadingComTwo";
 import { Chip, TextField } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Swal from 'sweetalert2';
-import { ToastContainer , toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchSkillsByIds, fetchSkillsByName } from "../utils/skillsHelper";
 
@@ -69,7 +69,7 @@ const SkillsAutocomplete = ({ value, onChange, placeholder = "Type to search ski
           setShowSuggestions(false);
         }
       }, 300);
-      
+
       return () => clearTimeout(timer);
     } else {
       setFilteredSkills([]);
@@ -119,7 +119,7 @@ const SkillsAutocomplete = ({ value, onChange, placeholder = "Type to search ski
           className="skills-input"
           onFocus={() => inputValue && setShowSuggestions(filteredSkills.length > 0)}
         />
-        
+
         {/* Suggestions dropdown */}
         {showSuggestions && (
           <div className="suggestions-dropdown">
@@ -184,7 +184,7 @@ const WorkExperienceForm = ({ experience, fetchExperiences }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -193,34 +193,34 @@ const WorkExperienceForm = ({ experience, fetchExperiences }) => {
 
   const showAlert = (title, message, type = 'error') => {
     const ToastComponent = (
-        <div>
+      <div>
         <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>{title}</div>
         <div>{message}</div>
-        </div>
+      </div>
     );
 
     const options = {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
     };
 
     switch (type) {
-        case 'success':
+      case 'success':
         toast.success(ToastComponent, options);
         break;
-        case 'warning':
+      case 'warning':
         toast.warning(ToastComponent, options);
         break;
-        case 'info':
+      case 'info':
         toast.info(ToastComponent, options);
         break;
-        default: // error
+      default: // error
         toast.error(ToastComponent, options);
     }
   };
@@ -277,16 +277,16 @@ const WorkExperienceForm = ({ experience, fetchExperiences }) => {
       return;
     }
 
-    const processedSkills = Array.isArray(formData.skills) 
+    const processedSkills = Array.isArray(formData.skills)
       ? formData.skills
-          .map(skill => {
-            // Convert string numbers to actual numbers
-            if (typeof skill === 'string' && !isNaN(skill)) {
-              return parseInt(skill, 10);
-            }
-            return skill;
-          })
-          .filter(skill => Number.isInteger(skill) && skill > 0)
+        .map(skill => {
+          // Convert string numbers to actual numbers
+          if (typeof skill === 'string' && !isNaN(skill)) {
+            return parseInt(skill, 10);
+          }
+          return skill;
+        })
+        .filter(skill => Number.isInteger(skill) && skill > 0)
       : [];
 
     const payload = {
@@ -304,8 +304,8 @@ const WorkExperienceForm = ({ experience, fetchExperiences }) => {
     };
 
     try {
-      const API_BASE_URL = 'http://localhost:3000';
-      
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
       if (experience && experience.id) {
         await axios.patch(
           `${API_BASE_URL}/api/work-experience/${experience.id}`,
@@ -357,7 +357,7 @@ const WorkExperienceForm = ({ experience, fetchExperiences }) => {
   const handleDelete = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -409,9 +409,9 @@ const WorkExperienceForm = ({ experience, fetchExperiences }) => {
         <p>{experience.company_name} ({employmentTypes.find(et => et.id === experience.employment_type)?.name})</p>
         <p>{experience.location}</p>
         <p>
-          {months[experience.start_month - 1]} {experience.start_year} - 
-          {experience.currently_working 
-            ? ' Present' 
+          {months[experience.start_month - 1]} {experience.start_year} -
+          {experience.currently_working
+            ? ' Present'
             : ` ${months[experience.end_month - 1]} ${experience.end_year}`
           }
         </p>

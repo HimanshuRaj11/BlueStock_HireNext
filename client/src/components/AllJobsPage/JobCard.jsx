@@ -15,9 +15,10 @@ const JobCard = ({ job }) => {
     const date = dayjs(job?.job_deadline).format("MMM Do, YYYY");
     const { user } = useUserContext();
     const [showComment, setShowComment] = useState(false);
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
     const getStatusLabel = (status) => {
-        switch(status) {
+        switch (status) {
             case VISIBILITY_STATUS.UNDER_REVIEW: return "Under Review";
             case VISIBILITY_STATUS.ACCEPTED: return "Approved";
             case VISIBILITY_STATUS.HOLD: return "On Hold";
@@ -27,7 +28,7 @@ const JobCard = ({ job }) => {
     };
 
     const getStatusClass = (status) => {
-        switch(status) {
+        switch (status) {
             case VISIBILITY_STATUS.UNDER_REVIEW: return "under-review";
             case VISIBILITY_STATUS.ACCEPTED: return "accepted";
             case VISIBILITY_STATUS.HOLD: return "hold";
@@ -49,7 +50,7 @@ const JobCard = ({ job }) => {
         };
         try {
             const response = await postHandler({
-                url: "http://localhost:3000/api/application/apply",
+                url: `${API_BASE_URL}/api/application/apply`,
                 body: appliedJob,
             });
             toast.success("Application submitted successfully!", {
@@ -88,7 +89,7 @@ const JobCard = ({ job }) => {
                     <div className={`status-tag ${getStatusClass(job.visibility_status)}`}>
                         {getStatusLabel(job.visibility_status)}
                         {job.admin_comment && (
-                            <button 
+                            <button
                                 className="comment-btn"
                                 onClick={() => setShowComment(!showComment)}
                                 title="View Admin Comment"
@@ -98,7 +99,7 @@ const JobCard = ({ job }) => {
                         )}
                     </div>
                 )}
-                
+
                 {/* Admin Comment Popup */}
                 {showComment && job.admin_comment && (
                     <div className="comment-popup">

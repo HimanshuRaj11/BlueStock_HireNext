@@ -10,119 +10,119 @@ import { fetchSkillsByIds, fetchSkillsByName } from "../utils/skillsHelper";
 
 // Skills Autocomplete Component
 const SkillsAutocomplete = ({ value, onChange, placeholder = "Type to search skills..." }) => {
-  const [filteredSkills, setFilteredSkills] = useState([]);
-  const [inputValue, setInputValue] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [currentSkills, setCurrentSkills] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+    const [filteredSkills, setFilteredSkills] = useState([]);
+    const [inputValue, setInputValue] = useState("");
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [currentSkills, setCurrentSkills] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-  // Load current skill names when IDs change
-  useEffect(() => {
-    const loadCurrentSkills = async () => {
-      if (value?.length > 0) {
-        setLoading(true);
-        setError(null);
-        try {
-          const skills = await fetchSkillsByIds(value);
-          setCurrentSkills(skills);
-        } catch (err) {
-          setError('Failed to load current skills');
-          console.error(err);
-        } finally {
-          setLoading(false);
+    // Load current skill names when IDs change
+    useEffect(() => {
+        const loadCurrentSkills = async () => {
+            if (value?.length > 0) {
+                setLoading(true);
+                setError(null);
+                try {
+                    const skills = await fetchSkillsByIds(value);
+                    setCurrentSkills(skills);
+                } catch (err) {
+                    setError('Failed to load current skills');
+                    console.error(err);
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setCurrentSkills([]);
+            }
+        };
+        loadCurrentSkills();
+    }, [value]);
+
+    // Search for skills when input changes
+    useEffect(() => {
+        if (inputValue.length > 1) {
+            const timer = setTimeout(async () => {
+                try {
+                    const skills = await fetchSkillsByName(inputValue);
+                    setFilteredSkills(skills);
+                    setShowSuggestions(skills.length > 0);
+                    setError(null);
+                } catch (err) {
+                    setError('Failed to search skills');
+                    console.error(err);
+                    setFilteredSkills([]);
+                    setShowSuggestions(false);
+                }
+            }, 300);
+
+            return () => clearTimeout(timer);
+        } else {
+            setFilteredSkills([]);
+            setShowSuggestions(false);
         }
-      } else {
-        setCurrentSkills([]);
-      }
+    }, [inputValue]);
+
+    const handleAddSkill = (skill) => {
+        if (!value.includes(skill.id)) {
+            onChange([...value, skill.id]);
+        }
+        setInputValue("");
+        setShowSuggestions(false);
     };
-    loadCurrentSkills();
-  }, [value]);
 
-  // Search for skills when input changes
-  useEffect(() => {
-    if (inputValue.length > 1) {
-      const timer = setTimeout(async () => {
-        try {
-          const skills = await fetchSkillsByName(inputValue);
-          setFilteredSkills(skills);
-          setShowSuggestions(skills.length > 0);
-          setError(null);
-        } catch (err) {
-          setError('Failed to search skills');
-          console.error(err);
-          setFilteredSkills([]);
-          setShowSuggestions(false);
-        }
-      }, 300);
-      
-      return () => clearTimeout(timer);
-    } else {
-      setFilteredSkills([]);
-      setShowSuggestions(false);
-    }
-  }, [inputValue]);
+    const handleRemoveSkill = (skillId) => {
+        onChange(value.filter(id => id !== skillId));
+    };
 
-  const handleAddSkill = (skill) => {
-    if (!value.includes(skill.id)) {
-      onChange([...value, skill.id]);
-    }
-    setInputValue("");
-    setShowSuggestions(false);
-  };
+    return (
+        <div className="skills-autocomplete">
+            {/* Display current skills as tags */}
+            <div className="skills-tags">
+                {loading && <span>Loading skills...</span>}
+                {error && <span className="error">{error}</span>}
+                {currentSkills.map(skill => (
+                    <span key={skill.id} className="skill-tag">
+                        {skill.name}
+                        <button
+                            type="button"
+                            onClick={() => handleRemoveSkill(skill.id)}
+                            className="remove-skill"
+                        >
+                            ×
+                        </button>
+                    </span>
+                ))}
+            </div>
 
-  const handleRemoveSkill = (skillId) => {
-    onChange(value.filter(id => id !== skillId));
-  };
+            {/* Search input */}
+            <div className="input-container">
+                <input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder={placeholder}
+                    className="skills-input"
+                    onFocus={() => inputValue && setShowSuggestions(filteredSkills.length > 0)}
+                />
 
-  return (
-    <div className="skills-autocomplete">
-      {/* Display current skills as tags */}
-      <div className="skills-tags">
-        {loading && <span>Loading skills...</span>}
-        {error && <span className="error">{error}</span>}
-        {currentSkills.map(skill => (
-          <span key={skill.id} className="skill-tag">
-            {skill.name}
-            <button
-              type="button"
-              onClick={() => handleRemoveSkill(skill.id)}
-              className="remove-skill"
-            >
-              ×
-            </button>
-          </span>
-        ))}
-      </div>
-
-      {/* Search input */}
-      <div className="input-container">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder={placeholder}
-          className="skills-input"
-          onFocus={() => inputValue && setShowSuggestions(filteredSkills.length > 0)}
-        />
-        
-        {/* Suggestions dropdown */}
-        {showSuggestions && (
-          <div className="suggestions-dropdown">
-            {filteredSkills.map((skill) => (
-              <div
-                key={skill.id}
-                className="suggestion-item"
-                onClick={() => handleAddSkill(skill)}
-              >
-                {skill.name}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+                {/* Suggestions dropdown */}
+                {showSuggestions && (
+                    <div className="suggestions-dropdown">
+                        {filteredSkills.map((skill) => (
+                            <div
+                                key={skill.id}
+                                className="suggestion-item"
+                                onClick={() => handleAddSkill(skill)}
+                            >
+                                {skill.name}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };
 
 const ProjectForm = ({ project, fetchProjects }) => {
@@ -154,8 +154,8 @@ const ProjectForm = ({ project, fetchProjects }) => {
 
     const handleSkillsChange = (newSkills) => {
         setFormData(prev => ({
-        ...prev,
-        skills: newSkills
+            ...prev,
+            skills: newSkills
         }));
     };
 
@@ -227,12 +227,12 @@ const ProjectForm = ({ project, fetchProjects }) => {
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true
-            }); 
+            });
             setLoading(false);
             return;
         }
 
-        if(formData.project_url && !/^https?:\/\/.+/.test(formData.project_url)) {
+        if (formData.project_url && !/^https?:\/\/.+/.test(formData.project_url)) {
             toast.error("Project URL must start with http:// or https://", {
                 position: "top-right",
                 autoClose: 3000,
@@ -247,7 +247,7 @@ const ProjectForm = ({ project, fetchProjects }) => {
 
         try {
             // Process skills to ensure they're numbers
-            const processedSkills = Array.isArray(formData.skills) 
+            const processedSkills = Array.isArray(formData.skills)
                 ? formData.skills
                     .map(skill => {
                         // Convert string numbers to actual numbers
@@ -271,7 +271,7 @@ const ProjectForm = ({ project, fetchProjects }) => {
 
             if (project && project.id) {
                 await axios.patch(
-                    `http://localhost:3000/api/projects/${project.id}`,
+                    `${import.meta.env.VITE_API_BASE_URL}/api/projects/${project.id}`,
                     payload,
                     {
                         withCredentials: true,
@@ -288,7 +288,7 @@ const ProjectForm = ({ project, fetchProjects }) => {
                 });
             } else {
                 await axios.post(
-                    `http://localhost:3000/api/projects`,
+                    `${import.meta.env.VITE_API_BASE_URL}/api/projects`,
                     payload,
                     {
                         withCredentials: true,
@@ -326,8 +326,8 @@ const ProjectForm = ({ project, fetchProjects }) => {
     };
 
     const handleDelete = async (e) => {
-        e.preventDefault(); 
-        e.stopPropagation(); 
+        e.preventDefault();
+        e.stopPropagation();
 
         const result = await Swal.fire({
             title: 'Are you sure?',
@@ -346,7 +346,7 @@ const ProjectForm = ({ project, fetchProjects }) => {
             setLoading(true);
             try {
                 await axios.delete(
-                    `http://localhost:3000/api/projects/${project.id}`,
+                    `${import.meta.env.VITE_API_BASE_URL}/api/projects/${project.id}`,
                     { withCredentials: true }
                 );
                 await fetchProjects();
@@ -380,7 +380,7 @@ const ProjectForm = ({ project, fetchProjects }) => {
                 <h4>{project.title}</h4>
                 {project.description && <p>{project.description}</p>}
                 <p>
-                    {new Date(project.start_date).toLocaleDateString()} - 
+                    {new Date(project.start_date).toLocaleDateString()} -
                     {project.is_ongoing ? 'Present' : new Date(project.end_date).toLocaleDateString()}
                 </p>
                 {project.project_url && (
@@ -403,10 +403,10 @@ const ProjectForm = ({ project, fetchProjects }) => {
     }
 
     return (
-        <FormWrapper 
+        <FormWrapper
             onSubmit={handleSubmit}
             method="post"
-        >  
+        >
             <div className="form-row">
                 <label>Project Title*</label>
                 <input
@@ -428,11 +428,11 @@ const ProjectForm = ({ project, fetchProjects }) => {
             </div>
             <div className="form-row">
                 <label>Skills</label>
-                    <SkillsAutocomplete
+                <SkillsAutocomplete
                     value={formData.skills || []}
                     onChange={handleSkillsChange}
                     placeholder="Type to search skills..."
-                    />
+                />
             </div>
             <div className="form-row">
                 <label>Project URL</label>
@@ -454,7 +454,7 @@ const ProjectForm = ({ project, fetchProjects }) => {
                     onChange={(e) => {
                         setFormData({
                             ...formData,
-                            start_date: e.target.value || null 
+                            start_date: e.target.value || null
                         });
                     }}
                     required
@@ -501,7 +501,7 @@ const ProjectForm = ({ project, fetchProjects }) => {
                         Cancel
                     </button>
                 )}
-            </div> 
+            </div>
         </FormWrapper>
     );
 };

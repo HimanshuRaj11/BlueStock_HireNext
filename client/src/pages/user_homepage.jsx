@@ -41,7 +41,7 @@ const UserHomePage = () => {
 
         let promises = [];
         promises.push(
-          axios.get("http://localhost:3000/api/user-profile/skills", 
+          axios.get(`{import.meta.env.VITE_API_BASE_URL}/api/user-profile/skills`,
             { withCredentials: true })
             .then(res => {
               return { skills: res.data.skills || res.data || [] };
@@ -53,10 +53,10 @@ const UserHomePage = () => {
 
         if (user.role === 3) {
           promises = promises.concat([
-            axios.get("http://localhost:3000/api/user-profile", 
+            axios.get(`{import.meta.env.VITE_API_BASE_URL}/api/user-profile`,
               { withCredentials: true })
               .then(res => {
-                return { 
+                return {
                   userProfile: res.data,
                   about: res.data.about || "",
                   full_address: res.data.full_address || "",
@@ -66,7 +66,7 @@ const UserHomePage = () => {
               .catch(() => {
                 return {};
               }),
-            axios.get("http://localhost:3000/api/education", 
+            axios.get(`{import.meta.env.VITE_API_BASE_URL}/api/education`,
               { withCredentials: true })
               .then(res => {
                 return { education: res.data.result || res.data || [] };
@@ -74,7 +74,7 @@ const UserHomePage = () => {
               .catch(() => {
                 return { education: [] };
               }),
-            axios.get("http://localhost:3000/api/work-experience", 
+            axios.get(`{import.meta.env.VITE_API_BASE_URL}/api/work-experience`,
               { withCredentials: true })
               .then(res => {
                 return { workExperiences: res.data.result || res.data || [] };
@@ -82,7 +82,7 @@ const UserHomePage = () => {
               .catch(() => {
                 return { workExperiences: [] };
               }),
-            axios.get("http://localhost:3000/api/certificates", 
+            axios.get(`{import.meta.env.VITE_API_BASE_URL}/api/certificates`,
               { withCredentials: true })
               .then(res => {
                 return { certificates: res.data.result || res.data || [] };
@@ -90,7 +90,7 @@ const UserHomePage = () => {
               .catch(() => {
                 return { certificates: [] };
               }),
-            axios.get("http://localhost:3000/api/projects", 
+            axios.get(`{import.meta.env.VITE_API_BASE_URL}/api/projects`,
               { withCredentials: true })
               .then(res => {
                 return { projects: res.data.result || res.data || [] };
@@ -101,7 +101,7 @@ const UserHomePage = () => {
           ]);
         } else if (user.role === 2) {
           promises.push(
-            axios.get("http://localhost:3000/api/recruiter-profile", 
+            axios.get(`{import.meta.env.VITE_API_BASE_URL}/api/recruiter-profile`,
               { withCredentials: true })
               .then(res => {
                 return { recruiterProfile: res.data };
@@ -120,7 +120,7 @@ const UserHomePage = () => {
           });
           return { ...acc, ...normalized };
         }, {});
-        
+
         setProfileData(prev => ({ ...prev, ...mergedData }));
 
       } catch (error) {
@@ -135,7 +135,7 @@ const UserHomePage = () => {
     if (!user) return;
     const completion = calculateProfileCompletion(user, profileData);
     setProfileCompletion(completion);
-    
+
     if (user?.updated_at) {
       setLastUpdated(dayjs(user.updated_at).fromNow());
     }
@@ -145,46 +145,46 @@ const UserHomePage = () => {
 
   return (
     <Wrapper progressColor={progressColor} profileCompletion={profileCompletion}>
-        <div className="container mx-auto px-4 py-8">
-            <div className="max-w-md mx-auto">
-                <div className="bg-white shadow rounded-xl p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="circle-container">
-                        <div className="circle">
-                          <div className="inner-circle">
-                            {user?.profile_photo ? (
-                              <img
-                                src={user.profile_photo}
-                                alt="Profile"
-                                className="profile-img"
-                              />
-                            ) : (
-                              <div className="avatar-placeholder">
-                                <div style={{ fontSize: "20px", fontWeight: "bold" }}>+</div>
-                                <div>Add photo</div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="percentage-label">{profileCompletion}%</div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-md mx-auto">
+          <div className="bg-white shadow rounded-xl p-6">
+            <div className="flex items-center gap-4">
+              <div className="circle-container">
+                <div className="circle">
+                  <div className="inner-circle">
+                    {user?.profile_photo ? (
+                      <img
+                        src={user.profile_photo}
+                        alt="Profile"
+                        className="profile-img"
+                      />
+                    ) : (
+                      <div className="avatar-placeholder">
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>+</div>
+                        <div>Add photo</div>
                       </div>
-
-                      <div className="flex-1">
-                        <h2 className="text-base font-semibold mb-1">{user?.full_name || "User"}</h2>
-                        <p className="text-sm text-gray-500 mb-1">
-                          Updated {lastUpdated || "recently"}
-                        </p>
-                        <Link
-                          to={`/dashboard/edit-profile/${user?.id}`}
-                          className="text-blue-600 font-semibold text-sm hover:text-blue-600"
-                        >
-                          Update Profile
-                        </Link>
-                      </div>
-                    </div>
+                    )}
+                  </div>
                 </div>
+                <div className="percentage-label">{profileCompletion}%</div>
+              </div>
+
+              <div className="flex-1">
+                <h2 className="text-base font-semibold mb-1">{user?.full_name || "User"}</h2>
+                <p className="text-sm text-gray-500 mb-1">
+                  Updated {lastUpdated || "recently"}
+                </p>
+                <Link
+                  to={`/dashboard/edit-profile/${user?.id}`}
+                  className="text-blue-600 font-semibold text-sm hover:text-blue-600"
+                >
+                  Update Profile
+                </Link>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </Wrapper>
   );
 };
@@ -205,7 +205,7 @@ const Wrapper = styled.div`
     border-radius: 50%;
     background: conic-gradient(
       ${({ progressColor, profileCompletion }) =>
-        `${progressColor} ${profileCompletion * 3.6}deg, #e0e0e0 ${profileCompletion * 3.6}deg`}
+    `${progressColor} ${profileCompletion * 3.6}deg, #e0e0e0 ${profileCompletion * 3.6}deg`}
     );
     display: flex;
     align-items: center;

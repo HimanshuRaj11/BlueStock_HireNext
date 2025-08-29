@@ -14,8 +14,8 @@ const Settings = () => {
         const actionText = newStatus === 2 ? "Hibernate" : "Delete";
         const confirm = await Swal.fire({
             title: `Are you sure you want to ${actionText} your account?`,
-            text: newStatus === 2 
-                ? "You can reactivate your account later by logging in again." 
+            text: newStatus === 2
+                ? "You can reactivate your account later by logging in again."
                 : "This will delete your account. You will need to appeal to reactivate.",
             icon: newStatus === 2 ? "warning" : "error",
             showCancelButton: true,
@@ -49,7 +49,7 @@ const Settings = () => {
 
         try {
             const res = await axios.patch(
-                "http://localhost:3000/api/auth/status",
+                `${import.meta.env.VITE_API_BASE_URL}/api/auth/status`,
                 { ac_status: newStatus },
                 { withCredentials: true }
             );
@@ -85,27 +85,26 @@ const Settings = () => {
                         <h2>Account Status</h2>
                         <p className="current-status">
                             Current status:{" "}
-                            <span className={`status ${
-                                user?.ac_status === 1 ? "active" : 
-                                user?.ac_status === 2 ? "hibernated" : "deleted"
-                            }`}>
-                                {user?.ac_status === 1 ? "Active" : 
-                                 user?.ac_status === 2 ? "Hibernated" : "Deleted"}
+                            <span className={`status ${user?.ac_status === 1 ? "active" :
+                                    user?.ac_status === 2 ? "hibernated" : "deleted"
+                                }`}>
+                                {user?.ac_status === 1 ? "Active" :
+                                    user?.ac_status === 2 ? "Hibernated" : "Deleted"}
                             </span>
                         </p>
-                        
+
                         {user?.ac_status === 1 && (
                             <div className="actions">
                                 <p>Change Account Status:</p>
                                 <div className="buttons">
-                                    <button 
-                                        onClick={() => changeStatus(2)} 
+                                    <button
+                                        onClick={() => changeStatus(2)}
                                         className="hibernate"
                                     >
                                         Hibernate Account
                                     </button>
-                                    <button 
-                                        onClick={() => changeStatus(3)} 
+                                    <button
+                                        onClick={() => changeStatus(3)}
                                         className="delete"
                                     >
                                         Delete Account

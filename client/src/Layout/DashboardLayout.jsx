@@ -52,7 +52,7 @@ const DashboardLayout = () => {
     const handleLogout = async () => {
         try {
             const response = await axios.post(
-                "http://localhost:3000/api/auth/logout",
+                `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`,
                 { withCredentials: true }
             );
             Swal.fire({

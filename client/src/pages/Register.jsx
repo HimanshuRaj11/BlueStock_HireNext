@@ -38,7 +38,7 @@ const Register = () => {
             const user = { full_name, username, email, password, signup_type: "e" };
             try {
                 const response = await axios.post(
-                    "http://localhost:3000/api/auth/register",
+                    `${import.meta.env.VITE_API_BASE_URL}/api/auth/register`,
                     user
                 );
 
@@ -64,13 +64,13 @@ const Register = () => {
         setIsGoogleLoading(true);
         try {
             const { user, error } = await signInWithGoogle();
-            
+
             if (error) {
                 throw new Error(error.message);
             }
 
             // Send Google user data to your backend
-            const response = await axios.post("http://localhost:3000/api/auth/google", {
+            const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/google`, {
                 email: user.email,
                 full_name: user.displayName,
                 profile_photo: user.photoURL,
@@ -117,11 +117,11 @@ const Register = () => {
                         both password not matched
                     </p>
                 )}
-                
+
                 {/* Google Sign Up Button */}
                 <div className="google-btn-container">
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         className="google-btn"
                         onClick={handleGoogleSignUp}
                         disabled={isGoogleLoading}
@@ -130,7 +130,7 @@ const Register = () => {
                         {isGoogleLoading ? "Processing..." : "Continue with Google"}
                     </button>
                 </div>
-                
+
                 <div className="divider">
                     <span>OR</span>
                 </div>

@@ -21,181 +21,181 @@ const purposes = [
   { id: 4, name: "Event" }
 ];
 
-  const CollegeAutocomplete = ({ value, onChange }) => {
-    const [colleges, setColleges] = useState([]);
-    const [allColleges, setAllColleges] = useState([]);
-    const [inputValue, setInputValue] = useState(value || "");
-    const [isLoading, setIsLoading] = useState(false);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [showCustomInput, setShowCustomInput] = useState(false);
-    const [customCollegeName, setCustomCollegeName] = useState("");
-    const dropdownRef = useRef(null);
-    const inputRef = useRef(null);
-    const customInputRef = useRef(null);
-    const isInteracting = useRef(false);
+const CollegeAutocomplete = ({ value, onChange }) => {
+  const [colleges, setColleges] = useState([]);
+  const [allColleges, setAllColleges] = useState([]);
+  const [inputValue, setInputValue] = useState(value || "");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customCollegeName, setCustomCollegeName] = useState("");
+  const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
+  const customInputRef = useRef(null);
+  const isInteracting = useRef(false);
 
-    useEffect(() => {
-      setIsLoading(true);
-      fetch('/data/colleges.json')
-        .then(response => response.json())
-        .then(data => {
-          setAllColleges(data);
-          setIsLoading(false);
-        })
-        .catch(error => {
-          console.error('Error loading colleges:', error);
-          setIsLoading(false);
-        });
-    }, []);
+  useEffect(() => {
+    setIsLoading(true);
+    fetch('/data/colleges.json')
+      .then(response => response.json())
+      .then(data => {
+        setAllColleges(data);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error('Error loading colleges:', error);
+        setIsLoading(false);
+      });
+  }, []);
 
-    useEffect(() => {
-      if (!isDropdownOpen || !isInteracting.current) return;
-      
-      const timer = setTimeout(() => {
-        if (inputValue.length > 2 && allColleges.length > 0) {
-          const searchTerm = inputValue.toLowerCase();
-          const filtered = [];
-          
-          for (let i = 0; i < allColleges.length && filtered.length < 8; i++) {
-            if (allColleges[i].name.toLowerCase().includes(searchTerm)) {
-              filtered.push(allColleges[i]);
-            }
+  useEffect(() => {
+    if (!isDropdownOpen || !isInteracting.current) return;
+
+    const timer = setTimeout(() => {
+      if (inputValue.length > 2 && allColleges.length > 0) {
+        const searchTerm = inputValue.toLowerCase();
+        const filtered = [];
+
+        for (let i = 0; i < allColleges.length && filtered.length < 8; i++) {
+          if (allColleges[i].name.toLowerCase().includes(searchTerm)) {
+            filtered.push(allColleges[i]);
           }
-          
-          setColleges(filtered);
-        } else {
-          setColleges([]);
         }
-      }, 50);
 
-      return () => clearTimeout(timer);
-    }, [inputValue, isDropdownOpen, allColleges]);
-
-    const handleInputChange = (e) => {
-      isInteracting.current = true;
-      const value = e.target.value;
-      setInputValue(value);
-      if (value.length > 2) {
-        setIsDropdownOpen(true);
+        setColleges(filtered);
       } else {
-        setIsDropdownOpen(false);
+        setColleges([]);
       }
-      if (value === "") {
-        onChange("");
-      }
-    };
+    }, 50);
 
-    const handleInputFocus = () => {
-      isInteracting.current = true;
-      if (inputValue.length > 2) {
-        setIsDropdownOpen(true);
-      }
-    };
+    return () => clearTimeout(timer);
+  }, [inputValue, isDropdownOpen, allColleges]);
 
-    const handleInputBlur = useCallback(() => {
-      isInteracting.current = false;
-      setTimeout(() => {
-        if (!dropdownRef.current?.contains(document.activeElement)) {
-          setIsDropdownOpen(false);
-        }
-      }, 200);
-    }, []);
-
-    const handleSelect = (college) => {
-      if (college === "others") {
-        setShowCustomInput(true);
-        setIsDropdownOpen(false);
-        setTimeout(() => customInputRef.current?.focus(), 0);
-      } else {
-        onChange(college.name);
-        setInputValue(college.name);
-        setIsDropdownOpen(false);
-        inputRef.current?.blur();
-      }
-    };
-
-    const handleCustomCollegeSubmit = () => {
-      if (customCollegeName.trim()) {
-        onChange(customCollegeName);
-        setInputValue(customCollegeName);
-        setShowCustomInput(false);
-        setCustomCollegeName("");
-      }
-    };
-
-    return (
-      <div className="college-autocomplete" ref={dropdownRef}>
-        {showCustomInput ? (
-          <div className="custom-college-input-container">
-            <input
-              ref={customInputRef}
-              type="text"
-              value={customCollegeName}
-              onChange={(e) => setCustomCollegeName(e.target.value)}
-              placeholder="Enter your college name"
-              className="college-input"
-              onKeyDown={(e) => e.key === "Enter" && handleCustomCollegeSubmit()}
-              onBlur={handleInputBlur}
-            />
-            <div className="custom-college-buttons">
-              <button 
-                type="button"
-                onClick={handleCustomCollegeSubmit}
-                className="save-custom-college"
-              >
-                Save
-              </button>
-              <button 
-                type="button"
-                onClick={() => setShowCustomInput(false)}
-                className="cancel-custom-college"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            onFocus={handleInputFocus}
-            onBlur={handleInputBlur}
-            placeholder="Type to search colleges..."
-            className="college-input"
-          />
-        )}
-        {isLoading && <div className="loading-text">Loading colleges...</div>}
-        {isDropdownOpen && (
-          <div className="college-dropdown">
-            <div
-              className="college-item others-option"
-              onClick={() => handleSelect("others")}
-            >
-              Others (Not in list)
-            </div>
-            
-            {colleges.map((college, index) => (
-              <div
-                key={index}
-                className="college-item"
-                onClick={() => handleSelect(college)}
-              >
-                {college.name}
-              </div>
-            ))}
-            
-            {inputValue.length > 2 && colleges.length === 0 && (
-              <div className="college-item no-results">
-                No colleges found. Select "Others" above to enter manually.
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    );
+  const handleInputChange = (e) => {
+    isInteracting.current = true;
+    const value = e.target.value;
+    setInputValue(value);
+    if (value.length > 2) {
+      setIsDropdownOpen(true);
+    } else {
+      setIsDropdownOpen(false);
+    }
+    if (value === "") {
+      onChange("");
+    }
   };
+
+  const handleInputFocus = () => {
+    isInteracting.current = true;
+    if (inputValue.length > 2) {
+      setIsDropdownOpen(true);
+    }
+  };
+
+  const handleInputBlur = useCallback(() => {
+    isInteracting.current = false;
+    setTimeout(() => {
+      if (!dropdownRef.current?.contains(document.activeElement)) {
+        setIsDropdownOpen(false);
+      }
+    }, 200);
+  }, []);
+
+  const handleSelect = (college) => {
+    if (college === "others") {
+      setShowCustomInput(true);
+      setIsDropdownOpen(false);
+      setTimeout(() => customInputRef.current?.focus(), 0);
+    } else {
+      onChange(college.name);
+      setInputValue(college.name);
+      setIsDropdownOpen(false);
+      inputRef.current?.blur();
+    }
+  };
+
+  const handleCustomCollegeSubmit = () => {
+    if (customCollegeName.trim()) {
+      onChange(customCollegeName);
+      setInputValue(customCollegeName);
+      setShowCustomInput(false);
+      setCustomCollegeName("");
+    }
+  };
+
+  return (
+    <div className="college-autocomplete" ref={dropdownRef}>
+      {showCustomInput ? (
+        <div className="custom-college-input-container">
+          <input
+            ref={customInputRef}
+            type="text"
+            value={customCollegeName}
+            onChange={(e) => setCustomCollegeName(e.target.value)}
+            placeholder="Enter your college name"
+            className="college-input"
+            onKeyDown={(e) => e.key === "Enter" && handleCustomCollegeSubmit()}
+            onBlur={handleInputBlur}
+          />
+          <div className="custom-college-buttons">
+            <button
+              type="button"
+              onClick={handleCustomCollegeSubmit}
+              className="save-custom-college"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowCustomInput(false)}
+              className="cancel-custom-college"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <input
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
+          placeholder="Type to search colleges..."
+          className="college-input"
+        />
+      )}
+      {isLoading && <div className="loading-text">Loading colleges...</div>}
+      {isDropdownOpen && (
+        <div className="college-dropdown">
+          <div
+            className="college-item others-option"
+            onClick={() => handleSelect("others")}
+          >
+            Others (Not in list)
+          </div>
+
+          {colleges.map((college, index) => (
+            <div
+              key={index}
+              className="college-item"
+              onClick={() => handleSelect(college)}
+            >
+              {college.name}
+            </div>
+          ))}
+
+          {inputValue.length > 2 && colleges.length === 0 && (
+            <div className="college-item no-results">
+              No colleges found. Select "Others" above to enter manually.
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const UserProfileForm = ({ profile, fetchProfile }) => {
   const { user } = useUserContext();
@@ -233,7 +233,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     if (name === 'user_type') {
       const newUserType = Number(value);
       setFormData(prev => {
@@ -241,7 +241,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
           ...prev,
           user_type: newUserType
         };
-        
+
         if (newUserType === 2) {
           newData.course_name = "";
           newData.specialization = "";
@@ -251,7 +251,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
           newData.designation = "";
           newData.work_experience = "";
         }
-        
+
         return newData;
       });
     } else {
@@ -267,7 +267,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
       const newPurposes = prev.purposes.includes(purposeId)
         ? prev.purposes.filter(id => id !== purposeId)
         : [...prev.purposes, purposeId];
-      
+
       return {
         ...prev,
         purposes: newPurposes
@@ -338,8 +338,8 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
     }
 
     // Common validation for all user types
-    if (!formData.currently_working && 
-        Number(formData.start_year) > Number(formData.end_year)) {
+    if (!formData.currently_working &&
+      Number(formData.start_year) > Number(formData.end_year)) {
       showAlert("End year must be after start year", 'error');
       return false;
     }
@@ -348,77 +348,77 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
   };
 
   const handleSubmit = async (e) => {
-      const toastId = toast.loading("Updating profile...", {
-        position: "top-right",
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false
-      });
+    const toastId = toast.loading("Updating profile...", {
+      position: "top-right",
+      autoClose: false,
+      closeOnClick: false,
+      draggable: false
+    });
 
-      e.preventDefault();
-      setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-      if (!validateForm()) {
-        setLoading(false);
-        toast.dismiss(toastId);
-        return;
-      }
+    if (!validateForm()) {
+      setLoading(false);
+      toast.dismiss(toastId);
+      return;
+    }
 
-      const payload = {
-        user_type: Number(formData.user_type),
-        course_name: [1, 3, 4].includes(Number(formData.user_type)) ? formData.course_name.trim() : null,
-        specialization: [1, 3, 4].includes(Number(formData.user_type)) ? formData.specialization.trim() : null,
-        start_year: Number(formData.start_year),
-        end_year: formData.currently_ongoing ? null : Number(formData.end_year),
-        designation: formData.user_type === 2 ? formData.designation.trim() : null,
-        work_experience: formData.user_type === 2 ? 
-          (formData.work_experience ? parseFloat(formData.work_experience) : 0) : 
-          null,
-        currently_working: formData.currently_working || false,
-        purposes: formData.purposes.map(Number),
-        college_org_name: formData.college_org_name.trim()
-      };
+    const payload = {
+      user_type: Number(formData.user_type),
+      course_name: [1, 3, 4].includes(Number(formData.user_type)) ? formData.course_name.trim() : null,
+      specialization: [1, 3, 4].includes(Number(formData.user_type)) ? formData.specialization.trim() : null,
+      start_year: Number(formData.start_year),
+      end_year: formData.currently_ongoing ? null : Number(formData.end_year),
+      designation: formData.user_type === 2 ? formData.designation.trim() : null,
+      work_experience: formData.user_type === 2 ?
+        (formData.work_experience ? parseFloat(formData.work_experience) : 0) :
+        null,
+      currently_working: formData.currently_working || false,
+      purposes: formData.purposes.map(Number),
+      college_org_name: formData.college_org_name.trim()
+    };
 
-      try {
-        const API_BASE_URL = 'http://localhost:3000';
-        
-        if (profile) {
-          await axios.patch(`${API_BASE_URL}/api/user-profile`, payload, { withCredentials: true });
-          toast.update(toastId, {
-            render: "Profile updated successfully!",
-            type: "success",
-            isLoading: false,
-            autoClose: 3000,
-            closeOnClick: true,
-            draggable: true
-          });
-        } else {
-          await axios.post(`${API_BASE_URL}/api/user-profile`, payload, { withCredentials: true });
-          toast.update(toastId, {
-            render: "Profile created successfully!",
-            type: "success",
-            isLoading: false,
-            autoClose: 3000,
-            closeOnClick: true,
-            draggable: true
-          });
-        }
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-        await fetchProfile();
-        setIsEditing(false);
-      } catch (error) {
-        console.error('Failed to save profile:', error);
+      if (profile) {
+        await axios.patch(`${API_BASE_URL}/api/user-profile`, payload, { withCredentials: true });
         toast.update(toastId, {
-          render: `Failed: ${error.response?.data?.message || error.message}`,
-          type: "error",
+          render: "Profile updated successfully!",
+          type: "success",
           isLoading: false,
           autoClose: 3000,
           closeOnClick: true,
           draggable: true
         });
-      } finally {
-        setLoading(false);
+      } else {
+        await axios.post(`${API_BASE_URL}/api/user-profile`, payload, { withCredentials: true });
+        toast.update(toastId, {
+          render: "Profile created successfully!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+          closeOnClick: true,
+          draggable: true
+        });
       }
+
+      await fetchProfile();
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+      toast.update(toastId, {
+        render: `Failed: ${error.response?.data?.message || error.message}`,
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+        closeOnClick: true,
+        draggable: true
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isEditing && profile) {
@@ -431,7 +431,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
         <ProfileField>
           <strong>College/Organization:</strong> {profile.college_org_name}
         </ProfileField>
-        
+
         {[1, 3, 4].includes(profile.user_type) && (
           <>
             <ProfileField>
@@ -442,7 +442,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
             </ProfileField>
           </>
         )}
-        
+
         {profile.user_type === 2 && (
           <>
             <ProfileField>
@@ -455,15 +455,15 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
         )}
 
         <ProfileField>
-          <strong>Period:</strong> {profile.start_year} - 
+          <strong>Period:</strong> {profile.start_year} -
           {profile.currently_working ? ' Present' : ` ${profile.end_year}`}
         </ProfileField>
-        
+
         <ProfileField>
-          <strong>Purposes:</strong> {profile.purposes.map(p => 
+          <strong>Purposes:</strong> {profile.purposes.map(p =>
             purposes.find(pur => pur.id === p)?.name).join(', ')}
         </ProfileField>
-        
+
         <Actions>
           <button onClick={() => setIsEditing(true)}>
             <ion-icon name="create-outline"></ion-icon> Edit
@@ -479,10 +479,10 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
       if (!isCollegeInput) {
         isInteracting.current = false;
       }
-    }}>        
+    }}>
       <div className="form-section">
         <h3>Basic Information</h3>
-        
+
         <div className="form-row">
           <label>User Type*</label>
           <select
@@ -496,7 +496,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
             ))}
           </select>
         </div>
-        
+
         <div className="form-row">
           <label>College/Organization Name*</label>
           <CollegeAutocomplete
@@ -507,7 +507,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
             }))}
           />
         </div>
-        
+
         <div className="form-row">
           <label>Purposes*</label>
           <div className="purpose-tags">
@@ -523,11 +523,11 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
           </div>
         </div>
       </div>
-      
+
       {[1, 3, 4].includes(Number(formData.user_type)) && (
         <div className="form-section">
           <h3>Education Details</h3>
-          
+
           <div className="form-row">
             <label>Course Name*</label>
             <input
@@ -538,7 +538,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
               required
             />
           </div>
-          
+
           <div className="form-row">
             <label>Specialization*</label>
             <input
@@ -549,7 +549,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
               required
             />
           </div>
-          
+
           <div className="form-row">
             <label>Start Year*</label>
             <input
@@ -564,11 +564,11 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
           </div>
         </div>
       )}
-      
+
       {Number(formData.user_type) === 2 && (
         <div className="form-section">
           <h3>Professional Details</h3>
-          
+
           <div className="form-row">
             <label>Designation*</label>
             <input
@@ -579,7 +579,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
               required
             />
           </div>
-          
+
           <div className="form-row">
             <label>Work Experience (years)*</label>
             <input
@@ -593,7 +593,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
               required
             />
           </div>
-          
+
           <div className="form-row">
             <label>Start Year*</label>
             <input
@@ -608,7 +608,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
           </div>
         </div>
       )}
-      
+
       {/* Common Currently Ongoing checkbox for all user types */}
       <div className="form-row">
         <label>
@@ -621,7 +621,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
           Currently Ongoing
         </label>
       </div>
-      
+
       {!formData.currently_working && (
         <div className="form-row">
           <label>End Year*</label>
@@ -636,7 +636,7 @@ const UserProfileForm = ({ profile, fetchProfile }) => {
           />
         </div>
       )}
-      
+
       <div className="button-row">
         <button type="submit" onClick={handleSubmit} className="save-btn">Save Profile</button>
         {profile && (
@@ -1058,4 +1058,4 @@ const FormWrapper = styled.form`
   }
 `;
 
-export {  UserProfileForm };
+export { UserProfileForm };

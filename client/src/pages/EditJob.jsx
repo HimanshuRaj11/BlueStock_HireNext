@@ -27,26 +27,26 @@ import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 const queryClient = new QueryClient(); // Create a client
 
 const SalaryTypes = [
-  { id: 'FIXED', label: 'Fixed' },
-  { id: 'RANGE', label: 'Range' },
-  { id: 'FIXED_INCENTIVE', label: 'Fixed + Incentives' },
-  { id: 'UNPAID', label: 'Unpaid' }
+    { id: 'FIXED', label: 'Fixed' },
+    { id: 'RANGE', label: 'Range' },
+    { id: 'FIXED_INCENTIVE', label: 'Fixed + Incentives' },
+    { id: 'UNPAID', label: 'Unpaid' }
 ];
 
 const Currencies = [
-  { code: 'INR', name: 'Indian Rupee' },
-  { code: 'USD', name: 'US Dollar' },
-  { code: 'EUR', name: 'Euro' },
-  { code: 'GBP', name: 'British Pound' },
-  { code: 'JPY', name: 'Japanese Yen' },
-  { code: 'AUD', name: 'Australian Dollar' }
+    { code: 'INR', name: 'Indian Rupee' },
+    { code: 'USD', name: 'US Dollar' },
+    { code: 'EUR', name: 'Euro' },
+    { code: 'GBP', name: 'British Pound' },
+    { code: 'JPY', name: 'Japanese Yen' },
+    { code: 'AUD', name: 'Australian Dollar' }
 ];
 
 const SalaryPeriods = [
-  { id: 'MONTH', label: 'Per Month' },
-  { id: 'YEAR', label: 'Per Year' },
-  { id: 'HOUR', label: 'Per Hour' },
-  { id: 'WEEK', label: 'Per Week' }
+    { id: 'MONTH', label: 'Per Month' },
+    { id: 'YEAR', label: 'Per Year' },
+    { id: 'HOUR', label: 'Per Hour' },
+    { id: 'WEEK', label: 'Per Week' }
 ];
 
 const FacilitiesCardSelector = ({ value, onChange }) => {
@@ -72,7 +72,7 @@ const FacilitiesCardSelector = ({ value, onChange }) => {
     useEffect(() => {
         const loadAllFacilities = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/facilities', {
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/facilities`, {
                     credentials: 'include',
                 });
                 const data = await response.json();
@@ -85,7 +85,7 @@ const FacilitiesCardSelector = ({ value, onChange }) => {
                 setLoading(false);
             }
         };
-        
+
         loadAllFacilities();
     }, []);
 
@@ -229,114 +229,114 @@ const CategoriesAutocomplete = ({ value, onChange, placeholder = "Type to search
 
 // Custom Skills Input Component with Autocomplete
 const SkillsAutocomplete = ({ value, onChange, placeholder = "Type to search skills..." }) => {
-  const [filteredSkills, setFilteredSkills] = useState([]);
-  const [inputValue, setInputValue] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [currentSkills, setCurrentSkills] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+    const [filteredSkills, setFilteredSkills] = useState([]);
+    const [inputValue, setInputValue] = useState("");
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [currentSkills, setCurrentSkills] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const loadCurrentSkills = async () => {
-      if (value?.length > 0) {
-        setLoading(true);
-        setError(null);
-        try {
-          const skills = await fetchSkillsByIds(value);
-          setCurrentSkills(skills);
-        } catch (err) {
-          setError('Failed to load current skills');
-          console.error(err);
-        } finally {
-          setLoading(false);
+    useEffect(() => {
+        const loadCurrentSkills = async () => {
+            if (value?.length > 0) {
+                setLoading(true);
+                setError(null);
+                try {
+                    const skills = await fetchSkillsByIds(value);
+                    setCurrentSkills(skills);
+                } catch (err) {
+                    setError('Failed to load current skills');
+                    console.error(err);
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setCurrentSkills([]);
+            }
+        };
+        loadCurrentSkills();
+    }, [value]);
+
+    useEffect(() => {
+        if (inputValue.length > 1) {
+            const timer = setTimeout(async () => {
+                try {
+                    const skills = await fetchSkillsByName(inputValue);
+                    setFilteredSkills(skills);
+                    setShowSuggestions(skills.length > 0);
+                    setError(null);
+                } catch (err) {
+                    setError('Failed to search skills');
+                    console.error(err);
+                    setFilteredSkills([]);
+                    setShowSuggestions(false);
+                }
+            }, 300);
+
+            return () => clearTimeout(timer);
+        } else {
+            setFilteredSkills([]);
+            setShowSuggestions(false);
         }
-      } else {
-        setCurrentSkills([]);
-      }
+    }, [inputValue]);
+
+    const handleAddSkill = (skill) => {
+        if (!value.includes(skill.id)) {
+            onChange([...value, skill.id]);
+        }
+        setInputValue("");
+        setShowSuggestions(false);
     };
-    loadCurrentSkills();
-  }, [value]);
 
-  useEffect(() => {
-    if (inputValue.length > 1) {
-      const timer = setTimeout(async () => {
-        try {
-          const skills = await fetchSkillsByName(inputValue);
-          setFilteredSkills(skills);
-          setShowSuggestions(skills.length > 0);
-          setError(null);
-        } catch (err) {
-          setError('Failed to search skills');
-          console.error(err);
-          setFilteredSkills([]);
-          setShowSuggestions(false);
-        }
-      }, 300);
-      
-      return () => clearTimeout(timer);
-    } else {
-      setFilteredSkills([]);
-      setShowSuggestions(false);
-    }
-  }, [inputValue]);
+    const handleRemoveSkill = (skillId) => {
+        onChange(value.filter(id => id !== skillId));
+    };
 
-  const handleAddSkill = (skill) => {
-    if (!value.includes(skill.id)) {
-      onChange([...value, skill.id]);
-    }
-    setInputValue("");
-    setShowSuggestions(false);
-  };
+    return (
+        <div className="skills-autocomplete">
+            <div className="skills-tags">
+                {loading && <span>Loading skills...</span>}
+                {error && <span className="error">{error}</span>}
+                {currentSkills.map(skill => (
+                    <span key={skill.id} className="skill-tag">
+                        {skill.name}
+                        <button
+                            type="button"
+                            onClick={() => handleRemoveSkill(skill.id)}
+                            className="remove-skill"
+                        >
+                            ×
+                        </button>
+                    </span>
+                ))}
+            </div>
 
-  const handleRemoveSkill = (skillId) => {
-    onChange(value.filter(id => id !== skillId));
-  };
+            <div className="input-container">
+                <input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder={placeholder}
+                    className="skills-input"
+                    onFocus={() => inputValue && setShowSuggestions(filteredSkills.length > 0)}
+                />
 
-  return (
-    <div className="skills-autocomplete">
-      <div className="skills-tags">
-        {loading && <span>Loading skills...</span>}
-        {error && <span className="error">{error}</span>}
-        {currentSkills.map(skill => (
-          <span key={skill.id} className="skill-tag">
-            {skill.name}
-            <button
-              type="button"
-              onClick={() => handleRemoveSkill(skill.id)}
-              className="remove-skill"
-            >
-              ×
-            </button>
-          </span>
-        ))}
-      </div>
-
-      <div className="input-container">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder={placeholder}
-          className="skills-input"
-          onFocus={() => inputValue && setShowSuggestions(filteredSkills.length > 0)}
-        />
-        
-        {showSuggestions && (
-          <div className="suggestions-dropdown">
-            {filteredSkills.map((skill) => (
-              <div
-                key={skill.id}
-                className="suggestion-item"
-                onClick={() => handleAddSkill(skill)}
-              >
-                {skill.name}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+                {showSuggestions && (
+                    <div className="suggestions-dropdown">
+                        {filteredSkills.map((skill) => (
+                            <div
+                                key={skill.id}
+                                className="suggestion-item"
+                                onClick={() => handleAddSkill(skill)}
+                            >
+                                {skill.name}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };
 
 const SimpleTagsInput = ({ value, onChange, placeholder = "Type and press Enter to add..." }) => {
@@ -401,7 +401,7 @@ const EditJob = () => {
         queryKey: ["updateJob"],
         queryFn: () =>
             getSingleHandler(
-                `http://localhost:3000/api/jobs/${id}`
+                `${import.meta.env.VITE_API_BASE_URL}/api/jobs/${id}`
             ),
     });
 
@@ -530,7 +530,7 @@ const EditJob = () => {
     });
 
     const onSubmit = async (data) => {
-        if (categories.length > 10){
+        if (categories.length > 10) {
             toast.error("You can select a maximum of 10 categories.", {
                 position: "top-right",
                 autoClose: 3000,
@@ -578,7 +578,7 @@ const EditJob = () => {
                 toast.error("Please enter the fixed amount");
                 return;
             }
-            
+
             if (salaryType === 'RANGE') {
                 if (!minAmount || !maxAmount) {
                     toast.error("Please enter both min and max amounts");
@@ -589,7 +589,7 @@ const EditJob = () => {
                     return;
                 }
             }
-            
+
             if (salaryType === 'FIXED_INCENTIVE' && !incentiveDetails) {
                 toast.error("Please provide incentive details");
                 return;
@@ -626,7 +626,7 @@ const EditJob = () => {
         // posting;
         updateJobMutation.mutate({
             body: updateJob,
-            url: `http://localhost:3000/api/jobs/${id}`,
+            url: `${import.meta.env.VITE_API_BASE_URL}/api/jobs/${id}`,
         });
     };
 
@@ -838,104 +838,103 @@ const EditJob = () => {
                                 <label htmlFor="eligibility">Eligibility</label>
                                 <div className="eligibility-tags">
                                     {EligibilityTypes.map((type) => (
-                                    <button
-                                        type="button"
-                                        key={type.id}
-                                        className={`eligibility-tag ${eligibility === type.id ? 'selected' : ''}`}
-                                        onClick={() => handleEligibilityChange(type.id)}
-                                    >
-                                        {type.label}
-                                    </button>
+                                        <button
+                                            type="button"
+                                            key={type.id}
+                                            className={`eligibility-tag ${eligibility === type.id ? 'selected' : ''}`}
+                                            onClick={() => handleEligibilityChange(type.id)}
+                                        >
+                                            {type.label}
+                                        </button>
                                     ))}
                                 </div>
                             </div>
 
                             {/* Student Currently Studying Checkbox */}
                             {eligibility && (
-                            <div className="row">
-                                <label className="checkbox-label">
-                                <input
-                                    type="checkbox"
-                                    checked={studentCurrentlyStudying}
-                                    onChange={(e) => {
-                                    if (eligibility !== 1) { // Only allow changes if not College Student
-                                        setStudentCurrentlyStudying(e.target.checked);
-                                    }
-                                    }}
-                                    disabled={eligibility === 1} // Disable for College Student
-                                />
-                                Open for college students currently studying
-                                {eligibility === 1 && <span className="text-xs text-gray-500 ml-2">(Required for College Students)</span>}
-                                </label>
-                            </div>
+                                <div className="row">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={studentCurrentlyStudying}
+                                            onChange={(e) => {
+                                                if (eligibility !== 1) { // Only allow changes if not College Student
+                                                    setStudentCurrentlyStudying(e.target.checked);
+                                                }
+                                            }}
+                                            disabled={eligibility === 1} // Disable for College Student
+                                        />
+                                        Open for college students currently studying
+                                        {eligibility === 1 && <span className="text-xs text-gray-500 ml-2">(Required for College Students)</span>}
+                                    </label>
+                                </div>
                             )}
 
                             {/* Year Selection (shown only for Freshers) */}
                             {eligibility === 2 && (
-                            <div className="row">
-                                <label>Select Graduation Years</label>
-                                <div className="year-tags">
-                                {YearOptions.map((year) => (
-                                    <button
-                                    type="button"
-                                    key={year}
-                                    className={`year-tag ${
-                                        selectedYears.includes(year) ? 'selected' : ''
-                                    }`}
-                                    onClick={() => {
-                                        if (year === 'All') {
-                                        setSelectedYears(['All']);
-                                        } else {
-                                        if (selectedYears.includes('All')) {
-                                            setSelectedYears([year]);
-                                        } else if (selectedYears.includes(year)) {
-                                            setSelectedYears(selectedYears.filter(y => y !== year));
-                                        } else {
-                                            setSelectedYears([...selectedYears, year]);
-                                        }
-                                        }
-                                    }}
-                                    >
-                                    {year}
-                                    </button>
-                                ))}
+                                <div className="row">
+                                    <label>Select Graduation Years</label>
+                                    <div className="year-tags">
+                                        {YearOptions.map((year) => (
+                                            <button
+                                                type="button"
+                                                key={year}
+                                                className={`year-tag ${selectedYears.includes(year) ? 'selected' : ''
+                                                    }`}
+                                                onClick={() => {
+                                                    if (year === 'All') {
+                                                        setSelectedYears(['All']);
+                                                    } else {
+                                                        if (selectedYears.includes('All')) {
+                                                            setSelectedYears([year]);
+                                                        } else if (selectedYears.includes(year)) {
+                                                            setSelectedYears(selectedYears.filter(y => y !== year));
+                                                        } else {
+                                                            setSelectedYears([...selectedYears, year]);
+                                                        }
+                                                    }
+                                                }}
+                                            >
+                                                {year}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {errors?.yearSelection && (
+                                        <span className="text-[10px] font-semibold text-red-600 mt-1 pl-1 tracking-wider">
+                                            {errors?.yearSelection?.message}
+                                        </span>
+                                    )}
                                 </div>
-                                {errors?.yearSelection && (
-                                <span className="text-[10px] font-semibold text-red-600 mt-1 pl-1 tracking-wider">
-                                    {errors?.yearSelection?.message}
-                                </span>
-                                )}
-                            </div>
                             )}
 
                             {/* Experience Range (shown only for Experienced) */}
                             {eligibility === 3 && (
-                            <div className="flex gap-4">
-                                <div className="row">
-                                <label htmlFor="experienceMin">Min Experience (years)</label>
-                                <input
-                                    type="number"
-                                    id="experienceMin"
-                                    value={experienceMin}
-                                    onChange={(e) => setExperienceMin(e.target.value)}
-                                    min="0"
-                                    step="0.5"
-                                    placeholder="0"
-                                />
+                                <div className="flex gap-4">
+                                    <div className="row">
+                                        <label htmlFor="experienceMin">Min Experience (years)</label>
+                                        <input
+                                            type="number"
+                                            id="experienceMin"
+                                            value={experienceMin}
+                                            onChange={(e) => setExperienceMin(e.target.value)}
+                                            min="0"
+                                            step="0.5"
+                                            placeholder="0"
+                                        />
+                                    </div>
+                                    <div className="row">
+                                        <label htmlFor="experienceMax">Max Experience (years)</label>
+                                        <input
+                                            type="number"
+                                            id="experienceMax"
+                                            value={experienceMax}
+                                            onChange={(e) => setExperienceMax(e.target.value)}
+                                            min={experienceMin || '0'}
+                                            step="0.5"
+                                            placeholder="5"
+                                        />
+                                    </div>
                                 </div>
-                                <div className="row">
-                                <label htmlFor="experienceMax">Max Experience (years)</label>
-                                <input
-                                    type="number"
-                                    id="experienceMax"
-                                    value={experienceMax}
-                                    onChange={(e) => setExperienceMax(e.target.value)}
-                                    min={experienceMin || '0'}
-                                    step="0.5"
-                                    placeholder="5"
-                                />
-                                </div>
-                            </div>
                             )}
 
                             {/* Vacancy */}
@@ -998,7 +997,7 @@ const EditJob = () => {
                                     <div className="salary-meta-fields">
                                         <div className="currency-selector">
                                             <label>Currency</label>
-                                            <select 
+                                            <select
                                                 value={currency}
                                                 onChange={(e) => setCurrency(e.target.value)}
                                             >
@@ -1009,10 +1008,10 @@ const EditJob = () => {
                                                 ))}
                                             </select>
                                         </div>
-                                        
+
                                         <div className="period-selector">
                                             <label>Period</label>
-                                            <select 
+                                            <select
                                                 value={salaryPeriod}
                                                 onChange={(e) => setSalaryPeriod(e.target.value)}
                                             >

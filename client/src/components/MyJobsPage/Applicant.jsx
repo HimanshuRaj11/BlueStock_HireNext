@@ -15,7 +15,7 @@ const Applicant = () => {
         queryKey: ["my-jobs"],
         queryFn: async () => {
             const response = await axios.get(
-                `http://localhost:3000/api/application/applicant-jobs`,
+                `${import.meta.env.VITE_API_BASE_URL}/api/application/applicant-jobs`,
                 { withCredentials: true }
             );
             return response?.data?.result;

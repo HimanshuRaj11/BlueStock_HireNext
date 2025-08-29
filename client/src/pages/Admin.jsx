@@ -11,7 +11,7 @@ const Admin = () => {
         queryKey: ["admin_info"],
         queryFn: () =>
             getAllHandler(
-                `http://localhost:3000/api/admin/info`
+                `${import.meta.env.VITE_API_BASE_URL}/api/admin/info`
             ),
     });
 

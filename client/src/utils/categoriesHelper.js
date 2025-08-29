@@ -1,7 +1,7 @@
 
 export const fetchCategoriesByName = async (searchTerm) => {
   try {
-    const response = await fetch(`http://localhost:3000/api/categories/search?q=${encodeURIComponent(searchTerm)}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/categories/search?q=${encodeURIComponent(searchTerm)}`, {
       credentials: 'include',
     });
 
@@ -25,8 +25,8 @@ export const fetchCategoriesByName = async (searchTerm) => {
 export const fetchCategoriesByIds = async (ids) => {
   try {
     if (!ids || !Array.isArray(ids) || ids.length === 0) return [];
-    
-    const response = await fetch('http://localhost:3000/api/categories/by-ids', {
+
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/categories/by-ids`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -35,22 +35,22 @@ export const fetchCategoriesByIds = async (ids) => {
       credentials: 'include',
       body: JSON.stringify({ ids })
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || `Failed to fetch categories. Status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     // Debugging log - remove in production
     console.log('Categories API Response:', data);
-    
+
     // Handle different possible response structures
     if (data.data) return data.data;
     if (Array.isArray(data)) return data;
     return [];
-    
+
   } catch (error) {
     console.error('Error fetching categories:', error);
     // Return empty array or fallback data
@@ -60,9 +60,9 @@ export const fetchCategoriesByIds = async (ids) => {
 
 export const convertCategoriesToIds = async (categoryNames) => {
   if (!categoryNames || categoryNames.length === 0) return [];
-  
+
   try {
-    const response = await fetch('http://localhost:3000/api/categories/by-ids', {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/categories/by-ids`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,17 +71,17 @@ export const convertCategoriesToIds = async (categoryNames) => {
       body: JSON.stringify({ names: categoryNames }),
       credentials: 'include'
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     if (data.status !== 'success') {
       throw new Error(data.message || 'Failed to convert categories to IDs');
     }
-    
+
     return data.data || [];
   } catch (error) {
     console.error('Error converting categories to IDs:', error);
@@ -91,7 +91,7 @@ export const convertCategoriesToIds = async (categoryNames) => {
 
 export const fetchSuggestedCategories = async (searchTerm) => {
   try {
-    const response = await fetch(`http://localhost:3000/api/categories/suggested`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/categories/suggested`, {
       credentials: 'include'
     });
 

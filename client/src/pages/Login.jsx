@@ -31,7 +31,7 @@ const Login = () => {
         setIsLoading(true);
         try {
             const response = await axios.post(
-                "http://localhost:3000/api/auth/login",
+                `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
                 data,
                 {
                     withCredentials: true,
@@ -41,8 +41,8 @@ const Login = () => {
             if (user?.role === 3 && user?.ac_status === 2) {
                 toast.warning(
                     <div>
-                        Your account is temporarily on hold. <br/>
-                        <a href="#" style={{color: '#007bff'}}>Click here to activate</a>
+                        Your account is temporarily on hold. <br />
+                        <a href="#" style={{ color: '#007bff' }}>Click here to activate</a>
                     </div>,
                     { autoClose: 3000 }
                 );
@@ -52,8 +52,8 @@ const Login = () => {
             if (user?.role === 3 && user?.ac_status === 3) {
                 toast.error(
                     <div>
-                        Your account has been permanently disabled.<br/>
-                        <a href="#" style={{color: '#007bff'}}>Click here to appeal</a>
+                        Your account has been permanently disabled.<br />
+                        <a href="#" style={{ color: '#007bff' }}>Click here to appeal</a>
                     </div>,
                     { autoClose: 10000 }
                 );
@@ -82,8 +82,8 @@ const Login = () => {
                 if (result.isBlocked) {
                     toast.info(
                         <div>
-                            {result.message}<br/>
-                            <a href="#" style={{color: '#007bff'}}>Click here to activate your account</a>
+                            {result.message}<br />
+                            <a href="#" style={{ color: '#007bff' }}>Click here to activate your account</a>
                         </div>,
                         { autoClose: 10000 }
                     );
@@ -103,7 +103,7 @@ const Login = () => {
 
     return (
         <Wrapper>
-            <ToastContainer 
+            <ToastContainer
                 position="top-center"
                 autoClose={10000}
                 hideProgressBar={false}
@@ -120,11 +120,11 @@ const Login = () => {
                     <Logo />
                 </div>
                 <h1>Login as User</h1>
-                
+
                 {/* Google Sign In Button */}
                 <div className="google-btn-container">
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         className="google-btn"
                         onClick={handleGoogleSignIn}
                         disabled={isGoogleLoading}
@@ -133,7 +133,7 @@ const Login = () => {
                         {isGoogleLoading ? "Processing..." : "Continue with Google"}
                     </button>
                 </div>
-                
+
                 <div className="divider">
                     <span>OR</span>
                 </div>

@@ -12,7 +12,7 @@ const UserContext = ({ children }) => {
         setUserLoading(true);
         try {
             const response = await axios.get(
-                `http://localhost:3000/api/auth/me`,
+                `${import.meta.env.VITE_API_BASE_URL}/api/auth/me`,
                 { withCredentials: true }
             );
             setUserError({ status: false, message: "" });
@@ -28,7 +28,7 @@ const UserContext = ({ children }) => {
         setUserLoading(true);
         try {
             const response = await axios.post(
-                "http://localhost:3000/api/auth/google",
+                `${import.meta.env.VITE_API_BASE_URL}/api/auth/google`,
                 {
                     email: googleUser.email,
                     full_name: googleUser.displayName,
@@ -64,7 +64,7 @@ const UserContext = ({ children }) => {
         setUserLoading(true);
         try {
             const response = await axios.post(
-                "http://localhost:3000/api/auth/google-recruiter",
+                `${import.meta.env.VITE_API_BASE_URL}/api/auth/google-recruiter`,
                 {
                     email: googleUser.email,
                     full_name: googleUser.displayName,
@@ -91,7 +91,7 @@ const UserContext = ({ children }) => {
     const handleLogout = async () => {
         try {
             await axios.post(
-                "http://localhost:3000/api/auth/logout",
+                `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`,
                 {},
                 { withCredentials: true }
             );

@@ -65,7 +65,7 @@ const CertificateForm = ({ certificate, fetchCertificates }) => {
         setLoading(true);
 
         if (!formData.title.trim()) {
-            toast.error("Certificate title is required", {  
+            toast.error("Certificate title is required", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -119,7 +119,7 @@ const CertificateForm = ({ certificate, fetchCertificates }) => {
         try {
             if (certificate && certificate.id) {
                 const response = await axios.patch(
-                    `http://localhost:3000/api/certificates/${certificate.id}`,
+                    `${import.meta.env.VITE_API_BASE_URL}/api/certificates/${certificate.id}`,
                     formData,
                     {
                         withCredentials: true,
@@ -136,7 +136,7 @@ const CertificateForm = ({ certificate, fetchCertificates }) => {
                 });
             } else {
                 const response = await axios.post(
-                    `http://localhost:3000/api/certificates`,
+                    `${import.meta.env.VITE_API_BASE_URL}/api/certificates`,
                     formData,
                     {
                         withCredentials: true,
@@ -174,8 +174,8 @@ const CertificateForm = ({ certificate, fetchCertificates }) => {
     };
 
     const handleDelete = async (e) => {
-        e.preventDefault(); 
-        e.stopPropagation(); 
+        e.preventDefault();
+        e.stopPropagation();
 
         const result = await Swal.fire({
             title: 'Are you sure?',
@@ -194,7 +194,7 @@ const CertificateForm = ({ certificate, fetchCertificates }) => {
             setLoading(true);
             try {
                 await axios.delete(
-                    `http://localhost:3000/api/certificates/${certificate.id}`,
+                    `${import.meta.env.VITE_API_BASE_URL}/api/certificates/${certificate.id}`,
                     { withCredentials: true }
                 );
                 await fetchCertificates();
@@ -228,7 +228,7 @@ const CertificateForm = ({ certificate, fetchCertificates }) => {
                 <h4>{certificate.title}</h4>
                 <p>{certificate.issuing_organization}</p>
                 <p>
-                    {new Date(certificate.issue_date).toLocaleDateString()} - 
+                    {new Date(certificate.issue_date).toLocaleDateString()} -
                     {certificate.expiry_date ? new Date(certificate.expiry_date).toLocaleDateString() : 'Present'}
                 </p>
                 {certificate.credential_id && <p>Credential ID: {certificate.credential_id}</p>}
@@ -253,10 +253,10 @@ const CertificateForm = ({ certificate, fetchCertificates }) => {
     }
 
     return (
-        <FormWrapper 
+        <FormWrapper
             onSubmit={handleSubmit}
             method="post"
-        >  
+        >
             <div className="form-row">
                 <label>Certificate Title*</label>
                 <input
@@ -333,7 +333,7 @@ const CertificateForm = ({ certificate, fetchCertificates }) => {
                         Cancel
                     </button>
                 )}
-            </div> 
+            </div>
         </FormWrapper>
     );
 };

@@ -29,7 +29,7 @@ export const deleteHandler = async (url) => {
 
 export const googleAuthHandler = async (googleData) => {
     const res = await axios.post(
-        "http://localhost:3000/api/auth/google",
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/google`,
         googleData,
         { withCredentials: true }
     );

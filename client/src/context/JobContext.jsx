@@ -15,10 +15,10 @@ const JobContext = ({ children }) => {
         setJobLoading(true);
         try {
             // Add user role to query params for proper filtering
-            const modifiedUrl = user?.role 
+            const modifiedUrl = user?.role
                 ? `${url}&role=${user.role}&userId=${user.id}`
                 : url;
-                
+
             const response = await axios.get(modifiedUrl, { withCredentials: true });
             setJobError({ status: false, message: "" });
             setJobs(response?.data);
@@ -33,23 +33,23 @@ const JobContext = ({ children }) => {
     const updateJobStatus = async (jobId, status, comment) => {
         try {
             const response = await axios.patch(
-                `http://localhost:3000/api/jobs/${jobId}/status`,
+                `${import.meta.env.VITE_API_BASE_URL}/api/jobs/${jobId}/status`,
                 { visibility_status: status, admin_comment: comment },
                 { withCredentials: true }
             );
-            
+
             // Update local state if successful
             if (jobs?.result) {
                 setJobs(prev => ({
                     ...prev,
-                    result: prev.result.map(job => 
-                        job.id === jobId 
+                    result: prev.result.map(job =>
+                        job.id === jobId
                             ? { ...job, visibility_status: status, admin_comment: comment }
                             : job
                     )
                 }));
             }
-            
+
             return { success: true, data: response.data };
         } catch (error) {
             return { success: false, error: error.response?.data || error.message };
@@ -58,7 +58,7 @@ const JobContext = ({ children }) => {
 
     useEffect(() => {
         handleJobFetch(
-            `http://localhost:3000/api/jobs?page=1`
+            `${import.meta.env.VITE_API_BASE_URL}/api/jobs?page=1`
         );
     }, [user?.role, user?.id]);
 

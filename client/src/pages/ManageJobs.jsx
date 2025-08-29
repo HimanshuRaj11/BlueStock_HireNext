@@ -23,7 +23,7 @@ const ManageJobs = () => {
         queryKey: ["my-jobs"],
         queryFn: () =>
             getAllHandler(
-                `http://localhost:3000/api/jobs/my-jobs`
+                `${import.meta.env.VITE_API_BASE_URL}/api/jobs/my-jobs`
             ),
     });
 
@@ -46,7 +46,7 @@ const ManageJobs = () => {
     const deleteJobHandler = async (id) => {
         try {
             await axios.delete(
-                `http://localhost:3000/api/jobs/${id}`,
+                `${import.meta.env.VITE_API_BASE_URL}/api/jobs/${id}`,
                 { withCredentials: true }
             );
             refetch();
